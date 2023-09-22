@@ -1,4 +1,6 @@
 package com.CrimsonBackendDatabase.crimsondb.Users;
 
-public class UsersRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsersRepository extends JpaRepository<Users, Long> {
 }
