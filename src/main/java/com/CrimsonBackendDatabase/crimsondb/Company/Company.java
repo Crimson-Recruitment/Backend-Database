@@ -1,5 +1,6 @@
 package com.CrimsonBackendDatabase.crimsondb.Company;
 
+import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import jakarta.persistence.*;
@@ -16,6 +17,7 @@ public class Company {
     private String companyName;
     private List<String> companyImages;
     private String email;
+    private boolean emailValid;
     private String profileImage;
     private String license;
     private String primaryPhoneNumber;
@@ -23,6 +25,7 @@ public class Company {
     private String secondaryPhoneNumber;
     private String category;
     private String tier;
+    private String password;
 
     @OneToOne(mappedBy = "company",cascade = CascadeType.ALL)
     private CompanyToken companyToken;
@@ -30,10 +33,13 @@ public class Company {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<Jobs> jobs;
 
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Collection<CompanyMessages> companyMessages;
+
     public Company() {
     }
 
-    public Company(String companyName, List<String> companyImages, String email, String profileImage, String license, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier) {
+    public Company(String companyName, List<String> companyImages, String email, String profileImage, String license, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier,String password) {
         this.companyName = companyName;
         this.companyImages = companyImages;
         this.email = email;
@@ -44,6 +50,27 @@ public class Company {
         this.secondaryPhoneNumber = secondaryPhoneNumber;
         this.category = category;
         this.tier = tier;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean isEmailValid() {
+        return emailValid;
+    }
+
+    public void setEmailValid(boolean emailValid) {
+        this.emailValid = emailValid;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCompanyName() {

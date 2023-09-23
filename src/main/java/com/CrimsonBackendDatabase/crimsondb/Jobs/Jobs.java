@@ -3,6 +3,7 @@ package com.CrimsonBackendDatabase.crimsondb.Jobs;
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.Collection;
 import java.util.Date;
@@ -10,27 +11,26 @@ import java.util.List;
 
 @Entity
 @Table
+@Getter
 public class Jobs {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String jobTitle;
     private String jobType;
     private boolean isVolunteering;
     private String locationType;
     private String field;
     private String jobDescription;
-
     private String location;
     private List<String> requirements;
     private Date expiryDate;
-
     private Integer minSalary;
     private Integer maxSalary;
     private boolean hideSalary;
     private List<String> benefits;
     private boolean requestCoverLetter;
+    private String coverLetter;
     private String otherDetails;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -43,7 +43,7 @@ public class Jobs {
     public Jobs() {
     }
 
-    public Jobs(String jobTitle, String jobType, boolean isVolunteering, String locationType, String field, String jobDescription, String location, List<String> requirements, Date expiryDate, Integer minSalary, Integer maxSalary, boolean hideSalary, List<String> benefits, boolean requestCoverLetter) {
+    public Jobs(String jobTitle, String jobType, boolean isVolunteering, String locationType, String field, String jobDescription, String location, List<String> requirements, Date expiryDate, Integer minSalary, Integer maxSalary, boolean hideSalary, List<String> benefits, boolean requestCoverLetter, String coverLetter) {
         this.jobTitle = jobTitle;
         this.jobType = jobType;
         this.isVolunteering = isVolunteering;
@@ -58,9 +58,10 @@ public class Jobs {
         this.hideSalary = hideSalary;
         this.benefits = benefits;
         this.requestCoverLetter = requestCoverLetter;
+        this.coverLetter = coverLetter;
     }
 
-    public Jobs(String jobTitle, String jobType, boolean isVolunteering, String locationType, String field, String jobDescription, String location, List<String> requirements, Date expiryDate, Integer minSalary, Integer maxSalary, boolean hideSalary, List<String> benefits, boolean requestCoverLetter, String otherDetails) {
+    public Jobs(String jobTitle, String jobType, boolean isVolunteering, String locationType, String field, String jobDescription, String location, List<String> requirements, Date expiryDate, Integer minSalary, Integer maxSalary, boolean hideSalary, List<String> benefits, boolean requestCoverLetter, String coverLetter, String otherDetails) {
         this.jobTitle = jobTitle;
         this.jobType = jobType;
         this.isVolunteering = isVolunteering;
@@ -75,19 +76,15 @@ public class Jobs {
         this.hideSalary = hideSalary;
         this.benefits = benefits;
         this.requestCoverLetter = requestCoverLetter;
+        this.coverLetter = coverLetter;
         this.otherDetails = otherDetails;
     }
 
-    public String getJobTitle() {
-        return jobTitle;
+    public void setCoverLetter(String coverLetter) {
+        this.coverLetter = coverLetter;
     }
-
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
-    }
-
-    public String getJobType() {
-        return jobType;
     }
 
     public void setJobType(String jobType) {
@@ -102,99 +99,54 @@ public class Jobs {
         isVolunteering = volunteering;
     }
 
-    public String getLocationType() {
-        return locationType;
-    }
-
     public void setLocationType(String locationType) {
         this.locationType = locationType;
-    }
-
-    public String getField() {
-        return field;
     }
 
     public void setField(String field) {
         this.field = field;
     }
 
-    public String getJobDescription() {
-        return jobDescription;
-    }
-
     public void setJobDescription(String jobDescription) {
         this.jobDescription = jobDescription;
-    }
-
-    public String getLocation() {
-        return location;
     }
 
     public void setLocation(String location) {
         this.location = location;
     }
 
-    public List<String> getRequirements() {
-        return requirements;
-    }
-
     public void setRequirements(List<String> requirements) {
         this.requirements = requirements;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
     }
 
     public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
     }
 
-    public Integer getMinSalary() {
-        return minSalary;
-    }
-
     public void setMinSalary(Integer minSalary) {
         this.minSalary = minSalary;
-    }
-
-    public Integer getMaxSalary() {
-        return maxSalary;
     }
 
     public void setMaxSalary(Integer maxSalary) {
         this.maxSalary = maxSalary;
     }
 
-    public boolean isHideSalary() {
-        return hideSalary;
-    }
-
     public void setHideSalary(boolean hideSalary) {
         this.hideSalary = hideSalary;
-    }
-
-    public List<String> getBenefits() {
-        return benefits;
     }
 
     public void setBenefits(List<String> benefits) {
         this.benefits = benefits;
     }
 
-    public boolean isRequestCoverLetter() {
-        return requestCoverLetter;
-    }
-
     public void setRequestCoverLetter(boolean requestCoverLetter) {
         this.requestCoverLetter = requestCoverLetter;
     }
-
-    public String getOtherDetails() {
-        return otherDetails;
-    }
-
     public void setOtherDetails(String otherDetails) {
         this.otherDetails = otherDetails;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
     }
 }
