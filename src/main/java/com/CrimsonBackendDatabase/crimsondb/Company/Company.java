@@ -30,6 +30,7 @@ public class Company implements Cloneable{
     private String overview;
     @JsonIgnore
     private String password;
+    private String zoomCode;
 
     @OneToOne(mappedBy = "company",cascade = CascadeType.ALL)
     private CompanyToken companyToken;
@@ -56,6 +57,14 @@ public class Company implements Cloneable{
 
     public String getOverview() {
         return overview;
+    }
+
+    public String getZoomCode() {
+        return zoomCode;
+    }
+
+    public void setZoomCode(String zoomCode) {
+        this.zoomCode = zoomCode;
     }
 
     public void setOverview(String overview) {
