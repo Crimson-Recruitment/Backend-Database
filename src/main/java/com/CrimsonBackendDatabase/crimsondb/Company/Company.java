@@ -3,6 +3,7 @@ package com.CrimsonBackendDatabase.crimsondb.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Collection;
@@ -10,21 +11,24 @@ import java.util.List;
 
 @Entity
 @Table
-public class Company {
+public class Company implements Cloneable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String companyName;
-    private List<String> companyImages;
+    @Lob
+    private List<byte[]> companyImages;
     private String email;
     private boolean emailValid;
-    private String profileImage;
-    private String license;
+    @Lob
+    private byte[] profileImage;
     private String primaryPhoneNumber;
     private boolean phoneNumberValid;
     private String secondaryPhoneNumber;
     private String category;
     private String tier;
+    private String overview;
+    @JsonIgnore
     private String password;
 
     @OneToOne(mappedBy = "company",cascade = CascadeType.ALL)
@@ -36,21 +40,26 @@ public class Company {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<CompanyMessages> companyMessages;
 
-    public Company() {
-    }
-
-    public Company(String companyName, List<String> companyImages, String email, String profileImage, String license, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier,String password) {
+    public Company(String companyName, List<byte[]> companyImages, String email,String overview, byte[] profileImage, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier,String password) {
         this.companyName = companyName;
         this.companyImages = companyImages;
         this.email = email;
         this.profileImage = profileImage;
-        this.license = license;
         this.primaryPhoneNumber = primaryPhoneNumber;
         this.phoneNumberValid = phoneNumberValid;
         this.secondaryPhoneNumber = secondaryPhoneNumber;
         this.category = category;
+        this.overview = overview;
         this.tier = tier;
         this.password = password;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
     public String getPassword() {
@@ -81,11 +90,11 @@ public class Company {
         this.companyName = companyName;
     }
 
-    public List<String> getCompanyImages() {
+    public List<byte[]> getCompanyImages() {
         return companyImages;
     }
 
-    public void setCompanyImages(List<String> companyImages) {
+    public void setCompanyImages(List<byte[]> companyImages) {
         this.companyImages = companyImages;
     }
 
@@ -97,20 +106,12 @@ public class Company {
         this.email = email;
     }
 
-    public String getProfileImage() {
+    public byte[] getProfileImage() {
         return profileImage;
     }
 
-    public void setProfileImage(String profileImage) {
+    public void setProfileImage(byte[] profileImage) {
         this.profileImage = profileImage;
-    }
-
-    public String getLicense() {
-        return license;
-    }
-
-    public void setLicense(String license) {
-        this.license = license;
     }
 
     public String getPrimaryPhoneNumber() {
@@ -153,4 +154,14 @@ public class Company {
         this.tier = tier;
     }
 
+    @Override
+    public Company clone() {
+        try {
+            Company clone = (Company) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

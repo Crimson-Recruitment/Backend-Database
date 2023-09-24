@@ -5,12 +5,16 @@ import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.Invali
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
+import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
+import com.CrimsonBackendDatabase.crimsondb.Utils.UserDetails;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -70,13 +74,23 @@ public class UsersService {
         }
     }
 
+    public UserDetails getUserInfo(Long id) throws InvalidUserException {
+        Optional<Users> user = usersRepository.findById(id);
+        if (user.isPresent()) {
+            return new UserDetails(user.get().getFirstName(), user.get().getLastName(),user.get().getProfileImage(), user.get().getPhoneNumber(), user.get().getEmail(), user.get().getLocation(),user.get().getCv());
+        } else {
+            throw new InvalidUserException();
+        }
+    }
+
     @Transactional
-    public HashMap<String, String> updateUserDetails(String accessToken, Users user) throws InvalidTokenException {
+    public HashMap<String, String> updateUserDetails(String accessToken, Users newUser) throws InvalidTokenException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-
+                Users user = userToken.get().getUsers();
+                user = newUser.clone();
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;

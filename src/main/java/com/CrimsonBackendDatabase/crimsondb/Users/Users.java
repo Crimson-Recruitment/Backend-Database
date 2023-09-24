@@ -7,11 +7,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table
 @Getter
-public class Users {
+public class Users implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +21,7 @@ public class Users {
     private String phoneNumber;
     private boolean phoneNumberValid;
     private String email;
+    private String location;
     private boolean emailValid;
     @Lob
     private byte[] profileImage;
@@ -28,6 +30,7 @@ public class Users {
     private String password;
     private String jobTitle;
     private String bio;
+    private List<String> skills;
     private String tier;
 
     @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
@@ -36,15 +39,14 @@ public class Users {
     private Collection<Applications> applications;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UserMessages> userMessages;
-    public Users() {
-    }
 
-    public Users(String firstName, String lastName, String phoneNumber, String email, byte[] profileImage, byte[] cv, String jobTitle, String bio, String tier) {
+    public Users(String firstName, String lastName, String phoneNumber, String email, byte[] profileImage, byte[] cv, String jobTitle, String bio,List<String> skills, String tier) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.phoneNumberValid = false;
         this.email = email;
+        this.skills = skills;
         this.emailValid = false;
         this.profileImage = profileImage;
         this.cv = cv;
@@ -52,6 +54,15 @@ public class Users {
         this.bio = bio;
         this.tier = tier;
     }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void setSkills(List<String> skills) {
+        this.skills = skills;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -88,5 +99,16 @@ public class Users {
 
     public void setTier(String tier) {
         this.tier = tier;
+    }
+
+    @Override
+    public Users clone() {
+        try {
+            Users clone = (Users) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

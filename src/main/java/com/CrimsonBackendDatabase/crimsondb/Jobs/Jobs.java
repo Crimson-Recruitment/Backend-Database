@@ -4,6 +4,7 @@ import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Collection;
 import java.util.Date;
@@ -24,6 +25,7 @@ public class Jobs {
     private String jobDescription;
     private String location;
     private List<String> requirements;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date expiryDate;
     private Integer minSalary;
     private Integer maxSalary;

@@ -1,10 +1,12 @@
 package com.CrimsonBackendDatabase.crimsondb.Company;
 
+import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCompanyException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
+import com.CrimsonBackendDatabase.crimsondb.Utils.CompanyDetails;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -55,35 +57,45 @@ public class CompanyService {
 
     };
 
-    public Company getCompanyDetails(String accessToken) throws InvalidTokenException {
+    public CompanyDetails getCompanyInfo(Long id) throws InvalidCompanyException {
+        Optional<Company> company = companyRepository.findById(id);
+        if(company.isPresent()){
+            return new CompanyDetails(company.get().getCompanyName(),company.get().getCategory(),company.get().getProfileImage(),company.get().getCompanyImages(),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
+        } else {
+            throw new InvalidCompanyException();
+        }
+    }
+
+    public Company getCompanyDetails(String accessToken) throws com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
                 return companyToken.get().getCompany();
             } else {
-                throw new InvalidTokenException();
+                throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
             }
         } else {
-            throw new InvalidTokenException();
+            throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
         }
     }
 
     @Transactional
-    public HashMap<String, String> updateCompanyDetails(String accessToken, Company user) throws InvalidTokenException {
+    public HashMap<String, String> updateCompanyDetails(String accessToken, Company newCompany) throws com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
-
+                Company company = companyToken.get().getCompany();
+                company = newCompany.clone();
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;
             } else {
-                throw new InvalidTokenException();
+                throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
             }
         } else {
-            throw new InvalidTokenException();
+            throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
         }
 
     };
@@ -133,7 +145,7 @@ public class CompanyService {
         }
     };
 
-    public HashMap<String, String> validatePassword(String accessToken) throws InvalidTokenException {
+    public HashMap<String, String> validatePrimaryPhoneNumber(String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
