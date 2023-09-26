@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface ApplicationsRepository extends JpaRepository<Applications, Long> {
     @Query("SELECT s FROM Applications s WHERE s.user = ?1")
     Optional<List<Applications>> findApplicationsByUsers(Users user);
+
 }

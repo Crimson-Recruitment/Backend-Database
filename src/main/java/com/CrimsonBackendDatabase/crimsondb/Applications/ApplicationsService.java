@@ -95,4 +95,27 @@ public class ApplicationsService {
         }
     };
 
+    public List<Applications> getAllCompanyApplications(String accessToken) throws InvalidTokenException {   Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
+        if(companyToken.isPresent()) {
+            boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
+            if(isValid) {
+                Optional<List<Jobs>> jobs = jobsRepository.findJobsByCompany(companyToken.get().getCompany());
+                if(jobs.isPresent()) {
+                    List<Applications> applications = new ArrayList<Applications>();
+                    for(Jobs job: jobs.get()) {
+                            applications.addAll(job.getApplications());
+                    }
+                    return applications;
+                } else {
+                    return new ArrayList<>();
+                }
+            } else {
+                throw new InvalidTokenException();
+            }
+        } else {
+            throw  new InvalidTokenException();
+        }
+
+    }
+
 }

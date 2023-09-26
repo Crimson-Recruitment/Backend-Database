@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 @Table
 @Getter
-public class Jobs {
+public class Jobs implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -150,5 +150,16 @@ public class Jobs {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    @Override
+    public Jobs clone() {
+        try {
+            Jobs clone = (Jobs) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

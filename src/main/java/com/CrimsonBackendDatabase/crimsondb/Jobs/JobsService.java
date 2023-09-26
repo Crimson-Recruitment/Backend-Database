@@ -5,6 +5,8 @@ import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCom
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyRepository;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
+import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.AccessDeniedException;
+import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.InvalidJobException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
@@ -67,27 +69,18 @@ public class JobsService {
     ;
 
     public List<Jobs> getAllJobs(String accessToken) throws InvalidTokenException {
-        return jobsRepository.findAll();
+        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
+        Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
+        if(userToken.isPresent() || companyToken.isPresent()) {
+            return jobsRepository.findAll();
+        } else {
+            throw new  InvalidTokenException();
+        }
     }
 
     ;
 
-    public List<Jobs> getAllCompanyJobs(String accessToken) throws InvalidTokenException {
-        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
-        if (companyToken.isPresent()) {
-            boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
-            if (isValid) {
-                Optional<List<Jobs>> jobs = jobsRepository.findJobsByCompany(companyToken.get().getCompany());
-                return jobs.orElseGet(ArrayList::new);
-            } else {
-                throw new InvalidTokenException();
-            }
-        } else {
-            throw new InvalidTokenException();
-        }
-};
-
-    public HashMap<String, String> updateJob(Long jobId, String accessToken) throws InvalidTokenException {
+    public HashMap<String, String> updateJob(Long jobId, Jobs newJob,String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
@@ -102,15 +95,24 @@ public class JobsService {
             throw new InvalidTokenException();
         }
     };
-    public HashMap<String, String> deleteJob(Long jobId, String accessToken) throws InvalidTokenException {
+    public HashMap<String, String> deleteJob(Long jobId, String accessToken) throws InvalidTokenException, AccessDeniedException, InvalidJobException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
-                jobsRepository.deleteById(jobId);
-                HashMap<String, String> data = new HashMap<String, String>();
-                data.put("result", "success");
-                return data;
+                Optional<Jobs> job = jobsRepository.findById(jobId);
+                if(job.isPresent()) {
+                    if(Objects.equals(companyToken.get().getCompany(), job.get().getCompany())){
+                        jobsRepository.deleteById(jobId);
+                        HashMap<String, String> data = new HashMap<String, String>();
+                        data.put("result", "success");
+                        return data;
+                    } else {
+                        throw new AccessDeniedException();
+                    }
+                } else {
+                    throw new InvalidJobException();
+                }
             } else {
                 throw new InvalidTokenException();
             }

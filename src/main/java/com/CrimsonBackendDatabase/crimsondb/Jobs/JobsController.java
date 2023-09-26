@@ -1,6 +1,8 @@
 package com.CrimsonBackendDatabase.crimsondb.Jobs;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCompanyException;
+import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.AccessDeniedException;
+import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.InvalidJobException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +39,32 @@ public class JobsController {
         try {
             return jobsService.getJobsByField(field);
         } catch (InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/all")
+    public List<Jobs> getAllJobs(@RequestHeader("Authorization") String accessToken) {
+        try {
+            return jobsService.getAllJobs(accessToken);
+        } catch (InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/update-job/{jobId}")
+    public  HashMap<String, String> updateJob(@RequestHeader("Authorization") String accessToken, @RequestBody Jobs job, @PathVariable("jobId") Long jobId) {
+        try {
+            return jobsService.updateJob(jobId,job,accessToken);
+        } catch (InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @GetMapping("/delete-job/{jobId}")
+    public  HashMap<String, String> deleteJob(@RequestHeader("Authorization") String accessToken, @PathVariable("jobId") Long jobId) {
+        try {
+            return jobsService.deleteJob(jobId,accessToken);
+        } catch (InvalidTokenException | AccessDeniedException | InvalidJobException e) {
             throw new RuntimeException(e);
         }
     }
