@@ -1,5 +1,6 @@
 package com.CrimsonBackendDatabase.crimsondb.Utils;
 
+import com.CrimsonBackendDatabase.crimsondb.CompanyImages.CompanyImages;
 import lombok.Getter;
 
 import java.util.List;
@@ -9,12 +10,12 @@ public class CompanyDetails {
     private String companyName;
     private String field;
     private byte[] profileImage;
-    private List<byte[]> companyImages;
+    private List<CompanyImages> companyImages;
     private String overview;
     private String primaryPhoneNumber;
     private String secondaryPhoneNumber;
 
-    public CompanyDetails(String companyName, String field, byte[] profileImage, List<byte[]> companyImages, String overview, String primaryPhoneNumber, String secondaryPhoneNumber) {
+    public CompanyDetails(String companyName, String field, byte[] profileImage, List<CompanyImages> companyImages, String overview, String primaryPhoneNumber, String secondaryPhoneNumber) {
         this.companyName = companyName;
         this.field = field;
         this.profileImage = profileImage;
@@ -36,7 +37,7 @@ public class CompanyDetails {
         this.profileImage = profileImage;
     }
 
-    public void setCompanyImages(List<byte[]> companyImages) {
+    public void setCompanyImages(List<CompanyImages> companyImages) {
         this.companyImages = companyImages;
     }
 

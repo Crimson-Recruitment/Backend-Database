@@ -1,5 +1,6 @@
 package com.CrimsonBackendDatabase.crimsondb.Company;
 
+import com.CrimsonBackendDatabase.crimsondb.CompanyImages.CompanyImages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
@@ -16,8 +17,6 @@ public class Company implements Cloneable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String companyName;
-    @Lob
-    private List<byte[]> companyImages;
     private String email;
     private boolean emailValid;
     @Lob
@@ -31,7 +30,8 @@ public class Company implements Cloneable{
     @JsonIgnore
     private String password;
     private String zoomCode;
-
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Collection<CompanyImages> companyImages;
     @OneToOne(mappedBy = "company",cascade = CascadeType.ALL)
     private CompanyToken companyToken;
 
@@ -41,9 +41,8 @@ public class Company implements Cloneable{
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<CompanyMessages> companyMessages;
 
-    public Company(String companyName, List<byte[]> companyImages, String email,String overview, byte[] profileImage, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier,String password) {
+    public Company(String companyName,String email,String overview, byte[] profileImage, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier,String password) {
         this.companyName = companyName;
-        this.companyImages = companyImages;
         this.email = email;
         this.profileImage = profileImage;
         this.primaryPhoneNumber = primaryPhoneNumber;
@@ -99,12 +98,20 @@ public class Company implements Cloneable{
         this.companyName = companyName;
     }
 
-    public List<byte[]> getCompanyImages() {
+    public Collection<CompanyMessages> getCompanyMessages() {
+        return companyMessages;
+    }
+
+    public Collection<CompanyImages> getCompanyImages() {
         return companyImages;
     }
 
-    public void setCompanyImages(List<byte[]> companyImages) {
+    public void setCompanyImages(Collection<CompanyImages> companyImages) {
         this.companyImages = companyImages;
+    }
+
+    public void setCompanyMessages(Collection<CompanyMessages> companyMessages) {
+        this.companyMessages = companyMessages;
     }
 
     public String getEmail() {

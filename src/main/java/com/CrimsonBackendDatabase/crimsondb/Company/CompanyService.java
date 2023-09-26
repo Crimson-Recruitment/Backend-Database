@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Company;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCompanyException;
+import com.CrimsonBackendDatabase.crimsondb.CompanyImages.CompanyImages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -60,7 +63,7 @@ public class CompanyService {
     public CompanyDetails getCompanyInfo(Long id) throws InvalidCompanyException {
         Optional<Company> company = companyRepository.findById(id);
         if(company.isPresent()){
-            return new CompanyDetails(company.get().getCompanyName(),company.get().getCategory(),company.get().getProfileImage(),company.get().getCompanyImages(),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
+            return new CompanyDetails(company.get().getCompanyName(),company.get().getCategory(),company.get().getProfileImage(),new ArrayList<CompanyImages>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
         } else {
             throw new InvalidCompanyException();
         }
