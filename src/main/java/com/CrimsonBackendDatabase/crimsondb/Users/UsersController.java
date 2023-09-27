@@ -73,7 +73,7 @@ public class UsersController {
             throw new RuntimeException(e);
         }
     }
-    @PostMapping("change-password")
+    @PostMapping("/change-password")
     public HashMap<String, String> changePassword(@RequestHeader("Authorization") String accessToken, @RequestBody PasswordChange passwordChange) {
         try {
             return  userService.changePassword(accessToken,passwordChange);

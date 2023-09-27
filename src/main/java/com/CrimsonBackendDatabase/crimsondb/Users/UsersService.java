@@ -86,18 +86,24 @@ public class UsersService {
     }
 
     @Transactional
-    public HashMap<String, String> updateUserDetails(String accessToken, Users newUser) throws InvalidTokenException {
+    public HashMap<String, String> updateUserDetails(String accessToken, Users user) throws InvalidTokenException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-                Optional<Users> user = usersRepository.findById(userToken.get().getUsers().getId());
-                user.get().setFirstName(newUser.getFirstName());
-                user.get().setLastName(newUser.getLastName());
-                user.get().setBio(newUser.getBio());
-                user.get().setJobTitle(newUser.getJobTitle());
-                user.get().setEmail(newUser.getEmail());
-                user.get().setLocation(newUser.getLocation());
+                System.out.println(user.toString());
+                usersRepository.findById(userToken.get().getUsers().getId()).map(target -> {
+                    target.setFirstName(user.getFirstName());
+                    target.setLastName(user.getLastName());
+                    target.setBio(user.getBio());
+                    target.setLocation(user.getLocation());
+                    target.setEmail(user.getEmail());
+                    target.setProfileImage(user.getProfileImage());
+                    target.setCv(user.getCv());
+                    target.setSkills(user.getSkills());
+                    target.setPassword(encoder.encode(user.getPassword()));
+                    return target;
+                });
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;
@@ -109,6 +115,7 @@ public class UsersService {
         }
 
     };
+    @Transactional
     public HashMap<String, String> changePassword(String accessToken, PasswordChange passwordChange) throws AuthenticationException, InvalidTokenException {
         Optional<UserToken> session = userTokenService.findUserToken(accessToken);
         if(session.isPresent()) {
@@ -155,6 +162,7 @@ public class UsersService {
         }
     };
 
+    @Transactional
     public HashMap<String, String> validatePassword(String accessToken) throws InvalidTokenException {
         Optional<UserToken> session = userTokenService.findUserToken(accessToken);
         if(session.isPresent()) {
