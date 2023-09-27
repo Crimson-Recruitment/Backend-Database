@@ -3,6 +3,7 @@ package com.CrimsonBackendDatabase.crimsondb.Users;
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
 import com.CrimsonBackendDatabase.crimsondb.UserMessages.UserMessages;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -11,7 +12,6 @@ import java.util.List;
 
 @Entity
 @Table
-@Getter
 public class Users implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,14 +33,20 @@ public class Users implements Cloneable {
     private List<String> skills;
     private String tier;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
     private UserToken userToken;
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UserMessages> userMessages;
 
-    public Users(String firstName, String lastName, String phoneNumber, String email, byte[] profileImage, byte[] cv, String jobTitle, String bio,List<String> skills, String tier) {
+    public Users() {
+    }
+
+    public Users(String firstName, String lastName, String phoneNumber, String email, byte[] profileImage, byte[] cv, String jobTitle, String bio, List<String> skills, String tier) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -53,6 +59,78 @@ public class Users implements Cloneable {
         this.jobTitle = jobTitle;
         this.bio = bio;
         this.tier = tier;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public boolean isPhoneNumberValid() {
+        return phoneNumberValid;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public boolean isEmailValid() {
+        return emailValid;
+    }
+
+    public byte[] getProfileImage() {
+        return profileImage;
+    }
+
+    public byte[] getCv() {
+        return cv;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public List<String> getSkills() {
+        return skills;
+    }
+
+    public String getTier() {
+        return tier;
+    }
+
+    public UserToken getUserToken() {
+        return userToken;
+    }
+
+    public Collection<Applications> getApplications() {
+        return applications;
+    }
+
+    public Collection<UserMessages> getUserMessages() {
+        return userMessages;
     }
 
     public void setLocation(String location) {

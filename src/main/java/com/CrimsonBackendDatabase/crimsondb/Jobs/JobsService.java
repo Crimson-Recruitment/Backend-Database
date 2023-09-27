@@ -10,7 +10,6 @@ import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.InvalidJobExcepti
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

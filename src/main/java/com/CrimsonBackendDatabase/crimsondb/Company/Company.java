@@ -27,7 +27,6 @@ public class Company implements Cloneable{
     private String category;
     private String tier;
     private String overview;
-    @JsonIgnore
     private String password;
     private String zoomCode;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

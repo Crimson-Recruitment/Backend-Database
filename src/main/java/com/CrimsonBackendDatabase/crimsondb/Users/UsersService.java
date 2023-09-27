@@ -8,15 +8,12 @@ import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsExcepti
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
 import com.CrimsonBackendDatabase.crimsondb.Utils.UserDetails;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UsersService {
@@ -29,6 +26,7 @@ public class UsersService {
     public UsersService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
+    @Transactional
     public HashMap<String, String> userRegister(Users user) throws EmailAlreadyExistsException {
         Optional<Users> checkUser = usersRepository.findUsersByEmail(user.getEmail());
         if(checkUser.isPresent()) {
@@ -39,17 +37,20 @@ public class UsersService {
             String accessToken = userTokenService.generateToken(user);
             HashMap<String, String> result = new HashMap<String, String>();
             result.put("result", "success");
+            result.put("accessToken", accessToken);
             return result;
         }
     };
+    @Transactional
     public HashMap<String, String> userLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException {
         Optional<Users> user = usersRepository.findUsersByEmail(email);
         if (user.isPresent()) {
             boolean val =  encoder.matches(password,user.get().getPassword());
             if(val){
-                String token = userTokenService.regenerateToken(user.get());
+                String accessToken = userTokenService.regenerateToken(user.get());
                 HashMap<String, String> result = new HashMap<String, String>();
                 result.put("result","success");
+                result.put("accessToken", accessToken);
                 return result;
             } else {
                 throw new AuthenticationException();
@@ -60,6 +61,7 @@ public class UsersService {
 
     };
 
+    @Transactional
     public Users getUserDetails(String accessToken) throws InvalidTokenException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
@@ -89,8 +91,13 @@ public class UsersService {
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-                Users user = userToken.get().getUsers();
-                user = newUser.clone();
+                Optional<Users> user = usersRepository.findById(userToken.get().getUsers().getId());
+                user.get().setFirstName(newUser.getFirstName());
+                user.get().setLastName(newUser.getLastName());
+                user.get().setBio(newUser.getBio());
+                user.get().setJobTitle(newUser.getJobTitle());
+                user.get().setEmail(newUser.getEmail());
+                user.get().setLocation(newUser.getLocation());
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;

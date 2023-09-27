@@ -3,16 +3,22 @@ package com.CrimsonBackendDatabase.crimsondb.Users;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
+import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.LoginDetails;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
 import com.CrimsonBackendDatabase.crimsondb.Utils.UserDetails;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
-@RequestMapping("v1/user")
+@RequestMapping("/user")
 public class UsersController {
 
     private final UsersService userService;
@@ -41,10 +47,11 @@ public class UsersController {
     }
 
     @GetMapping("/user-details")
-    public Users getUserDetails(@RequestHeader("Authorization") String accessToken) {
+    public ResponseEntity<Users> getUserDetails(@RequestHeader("Authorization") String accessToken) {
         try {
-            return  userService.getUserDetails(accessToken);
-        } catch (com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
+            return new ResponseEntity<Users>(userService.getUserDetails(accessToken), HttpStatus.OK);
+        } catch (
+                 com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
             throw new RuntimeException(e);
         }
     }
@@ -91,4 +98,5 @@ public class UsersController {
             throw new RuntimeException(e);
         }
     }
+
 }
