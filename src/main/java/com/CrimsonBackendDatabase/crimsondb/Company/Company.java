@@ -29,28 +29,41 @@ public class Company implements Cloneable{
     private String overview;
     private String password;
     private String zoomCode;
+
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Collection<CompanyImages> companyImages;
+    @JsonIgnore
     @OneToOne(mappedBy = "company",cascade = CascadeType.ALL)
     private CompanyToken companyToken;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<Jobs> jobs;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<CompanyMessages> companyMessages;
 
-    public Company(String companyName,String email,String overview, byte[] profileImage, String primaryPhoneNumber, boolean phoneNumberValid, String secondaryPhoneNumber, String category, String tier,String password) {
+    public Company() {
+    }
+
+    public Company(String companyName, String email, String overview, byte[] profileImage, String primaryPhoneNumber, String secondaryPhoneNumber, String category, String tier, String password) {
         this.companyName = companyName;
         this.email = email;
         this.profileImage = profileImage;
         this.primaryPhoneNumber = primaryPhoneNumber;
-        this.phoneNumberValid = phoneNumberValid;
+        this.phoneNumberValid = false;
+        this.emailValid = false;
         this.secondaryPhoneNumber = secondaryPhoneNumber;
         this.category = category;
         this.overview = overview;
         this.tier = tier;
         this.password = password;
+    }
+
+    public CompanyToken getCompanyToken() {
+        return companyToken;
     }
 
     public String getOverview() {

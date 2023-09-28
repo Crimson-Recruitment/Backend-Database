@@ -97,6 +97,14 @@ public class UsersService {
                     target.setLastName(user.getLastName());
                     target.setBio(user.getBio());
                     target.setLocation(user.getLocation());
+                    if(!Objects.equals(target.getEmail(), user.getEmail())) {
+                        user.setEmail(target.getEmail());
+                        user.setEmailValid(false);
+                    }
+                    if(!Objects.equals(target.getPhoneNumber(), user.getPhoneNumber())) {
+                        target.setPhoneNumber(user.getPhoneNumber());
+                        target.setPhoneNumberValid(false);
+                    }
                     target.setEmail(user.getEmail());
                     target.setProfileImage(user.getProfileImage());
                     target.setCv(user.getCv());
@@ -115,6 +123,23 @@ public class UsersService {
         }
 
     };
+
+    @Transactional
+    public HashMap<String, String> getAccessToken(String email) throws InvalidUserException {
+        Optional<Users> user = usersRepository.findUsersByEmail(email);
+        if(user.isPresent()) {
+            Optional<HashMap<String, String>> val = user.map(target -> {
+                HashMap<String,String> result = new HashMap<String, String>();
+                result.put("result","success");
+                result.put("accessToken",target.getUserToken().getAccessToken());
+                return result;
+            });
+            return val.orElseThrow();
+        } else {
+            throw new InvalidUserException();
+        }
+    }
+
     @Transactional
     public HashMap<String, String> changePassword(String accessToken, PasswordChange passwordChange) throws AuthenticationException, InvalidTokenException {
         Optional<UserToken> session = userTokenService.findUserToken(accessToken);
@@ -122,19 +147,10 @@ public class UsersService {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(session.get().getUsers().getId()));
             if(isValid) {
                 Users users = session.get().getUsers();
-                boolean val =  encoder.matches(
-                        passwordChange.getOldPassword(),
-                        users.getPassword()
-                );
-                if (val) {
-                    users.setPassword(encoder.encode(passwordChange.getNewPassword()));
-                    HashMap<String, String> data = new HashMap<String, String>();
-                    data.put("result", "success");
-                    return data;
-                }else {
-                    throw new AuthenticationException("Incorrect old password");
-                }
-
+                users.setPassword(encoder.encode(passwordChange.getNewPassword()));
+                HashMap<String, String> data = new HashMap<String, String>();
+                data.put("result", "success");
+                return data;
             } else {
                 throw new InvalidTokenException();
             }

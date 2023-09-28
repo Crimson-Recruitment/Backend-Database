@@ -12,15 +12,17 @@ public class CompanyDetails {
     private byte[] profileImage;
     private List<CompanyImages> companyImages;
     private String overview;
+    private String email;
     private String primaryPhoneNumber;
     private String secondaryPhoneNumber;
 
-    public CompanyDetails(String companyName, String field, byte[] profileImage, List<CompanyImages> companyImages, String overview, String primaryPhoneNumber, String secondaryPhoneNumber) {
+    public CompanyDetails(String companyName, String field, String email, byte[] profileImage, List<CompanyImages> companyImages, String overview, String primaryPhoneNumber, String secondaryPhoneNumber) {
         this.companyName = companyName;
         this.field = field;
         this.profileImage = profileImage;
         this.companyImages = companyImages;
         this.overview = overview;
+        this.email = email;
         this.primaryPhoneNumber = primaryPhoneNumber;
         this.secondaryPhoneNumber = secondaryPhoneNumber;
     }

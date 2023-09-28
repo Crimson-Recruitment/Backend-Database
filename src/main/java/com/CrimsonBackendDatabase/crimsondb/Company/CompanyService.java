@@ -7,6 +7,8 @@ import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
+import com.CrimsonBackendDatabase.crimsondb.Users.Users;
+import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.CompanyDetails;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -29,6 +32,7 @@ public class CompanyService {
     public CompanyService(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
     }
+    @Transactional
     public HashMap<String, String> companyRegister(Company company) throws EmailAlreadyExistsException {
         Optional<Company> checkCompany = companyRepository.findCompanyByEmail(company.getEmail());
         if(checkCompany.isPresent()) {
@@ -39,17 +43,20 @@ public class CompanyService {
             String accessToken = companyTokenService.generateToken(company);
             HashMap<String, String> result = new HashMap<String, String>();
             result.put("result", "success");
+            result.put("accessToken",accessToken);
             return result;
         }
     };
+    @Transactional
     public HashMap<String, String> companyLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException {
         Optional<Company> user = companyRepository.findCompanyByEmail(email);
         if (user.isPresent()) {
             boolean val =  encoder.matches(password,user.get().getPassword());
             if(val){
-                String token = companyTokenService.regenerateToken(user.get());
+                String accessToken = companyTokenService.regenerateToken(user.get());
                 HashMap<String, String> result = new HashMap<String, String>();
                 result.put("result","success");
+                result.put("accessToken",accessToken);
                 return result;
             } else {
                 throw new AuthenticationException();
@@ -60,15 +67,17 @@ public class CompanyService {
 
     };
 
+    @Transactional
     public CompanyDetails getCompanyInfo(Long id) throws InvalidCompanyException {
         Optional<Company> company = companyRepository.findById(id);
         if(company.isPresent()){
-            return new CompanyDetails(company.get().getCompanyName(),company.get().getCategory(),company.get().getProfileImage(),new ArrayList<CompanyImages>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
+            return new CompanyDetails(company.get().getCompanyName(),company.get().getCategory(),company.get().getEmail(),company.get().getProfileImage(),new ArrayList<CompanyImages>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
         } else {
             throw new InvalidCompanyException();
         }
     }
 
+    @Transactional
     public Company getCompanyDetails(String accessToken) throws com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
@@ -89,8 +98,21 @@ public class CompanyService {
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
-                Company company = companyToken.get().getCompany();
-                company = newCompany.clone();
+                companyRepository.findById(companyToken.get().getCompany().getId()).map(target -> {
+                  target.setCompanyName(newCompany.getCompanyName());
+                  if(!Objects.equals(newCompany.getEmail(),target.getEmail())) {
+                      target.setEmail(newCompany.getEmail());
+                      target.setEmailValid(false);
+                    };
+                  target.setProfileImage(newCompany.getProfileImage());
+                  if(!Objects.equals(target.getPrimaryPhoneNumber(),newCompany.getPrimaryPhoneNumber())) {
+                      target.setPrimaryPhoneNumber(newCompany.getPrimaryPhoneNumber());
+                      target.setPhoneNumberValid(false);
+                  };
+                  target.setSecondaryPhoneNumber(newCompany.getSecondaryPhoneNumber());
+                  target.setOverview(newCompany.getOverview());
+                  return target;
+                });
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;
@@ -102,25 +124,32 @@ public class CompanyService {
         }
 
     };
+    @Transactional
+    public HashMap<String, String> getAccessToken(String email) throws InvalidUserException {
+        Optional<Company> company = companyRepository.findCompanyByEmail(email);
+        if(company.isPresent()) {
+            Optional<HashMap<String, String>> val = company.map(target -> {
+                HashMap<String,String> result = new HashMap<String, String>();
+                result.put("result","success");
+                result.put("accessToken",target.getCompanyToken().getAccessToken());
+                return result;
+            });
+            return val.orElseThrow();
+        } else {
+            throw new InvalidUserException();
+        }
+    }
+    @Transactional
     public HashMap<String, String> changePassword(String accessToken, PasswordChange passwordChange) throws AuthenticationException, InvalidTokenException {
         Optional<CompanyToken> session = companyTokenService.findCompanyToken(accessToken);
         if(session.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(session.get().getCompany().getId()));
             if(isValid) {
                 Company company = session.get().getCompany();
-                boolean val =  encoder.matches(
-                        passwordChange.getOldPassword(),
-                        company.getPassword()
-                );
-                if (val) {
                     company.setPassword(encoder.encode(passwordChange.getNewPassword()));
                     HashMap<String, String> data = new HashMap<String, String>();
                     data.put("result", "success");
                     return data;
-                }else {
-                    throw new AuthenticationException("Incorrect old password");
-                }
-
             } else {
                 throw new InvalidTokenException();
             }
@@ -148,6 +177,7 @@ public class CompanyService {
         }
     };
 
+    @Transactional
     public HashMap<String, String> validatePrimaryPhoneNumber(String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {

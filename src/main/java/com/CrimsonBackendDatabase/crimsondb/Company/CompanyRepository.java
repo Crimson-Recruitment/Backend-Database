@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
-    @Query("SELECT s FROM Users s WHERE s.email = ?1")
+    @Query("SELECT s FROM Company s WHERE s.email = ?1")
     Optional<Company> findCompanyByEmail(String email);
 }

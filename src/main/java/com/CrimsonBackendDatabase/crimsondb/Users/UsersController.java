@@ -82,6 +82,14 @@ public class UsersController {
             throw new RuntimeException(e);
         }
     }
+    @GetMapping("/get-access-token")
+    public  HashMap<String, String> getAccessToken(@RequestParam("email")String email) {
+        try {
+            return userService.getAccessToken(email);
+        } catch (InvalidUserException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @GetMapping("/validate-email")
     public HashMap<String, String> validateEmail(@RequestHeader("Authorization") String accessToken) {
         try {
