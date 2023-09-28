@@ -2,7 +2,9 @@ package com.CrimsonBackendDatabase.crimsondb.Jobs;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,17 +27,17 @@ public class Jobs implements Cloneable {
     private String jobDescription;
     private String location;
     private List<String> requirements;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date expiryDate;
     private Integer minSalary;
     private Integer maxSalary;
     private boolean hideSalary;
     private List<String> benefits;
     private boolean requestCoverLetter;
-    private String coverLetter;
     private String otherDetails;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
@@ -43,24 +45,6 @@ public class Jobs implements Cloneable {
     private Collection<Applications> applications;
 
     public Jobs() {
-    }
-
-    public Jobs(String jobTitle, String jobType, boolean isVolunteering, String locationType, String field, String jobDescription, String location, List<String> requirements, Date expiryDate, Integer minSalary, Integer maxSalary, boolean hideSalary, List<String> benefits, boolean requestCoverLetter, String coverLetter) {
-        this.jobTitle = jobTitle;
-        this.jobType = jobType;
-        this.isVolunteering = isVolunteering;
-        this.locationType = locationType;
-        this.field = field;
-        this.jobDescription = jobDescription;
-        this.location = location;
-        this.requirements = requirements;
-        this.expiryDate = expiryDate;
-        this.minSalary = minSalary;
-        this.maxSalary = maxSalary;
-        this.hideSalary = hideSalary;
-        this.benefits = benefits;
-        this.requestCoverLetter = requestCoverLetter;
-        this.coverLetter = coverLetter;
     }
 
     public Jobs(String jobTitle, String jobType, boolean isVolunteering, String locationType, String field, String jobDescription, String location, List<String> requirements, Date expiryDate, Integer minSalary, Integer maxSalary, boolean hideSalary, List<String> benefits, boolean requestCoverLetter, String coverLetter, String otherDetails) {
@@ -78,13 +62,77 @@ public class Jobs implements Cloneable {
         this.hideSalary = hideSalary;
         this.benefits = benefits;
         this.requestCoverLetter = requestCoverLetter;
-        this.coverLetter = coverLetter;
         this.otherDetails = otherDetails;
     }
 
-    public void setCoverLetter(String coverLetter) {
-        this.coverLetter = coverLetter;
+    public Long getId() {
+        return id;
     }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public String getLocationType() {
+        return locationType;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public String getJobDescription() {
+        return jobDescription;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public List<String> getRequirements() {
+        return requirements;
+    }
+
+    public Date getExpiryDate() {
+        return expiryDate;
+    }
+
+    public Integer getMinSalary() {
+        return minSalary;
+    }
+
+    public Integer getMaxSalary() {
+        return maxSalary;
+    }
+
+    public boolean isHideSalary() {
+        return hideSalary;
+    }
+
+    public List<String> getBenefits() {
+        return benefits;
+    }
+
+    public boolean isRequestCoverLetter() {
+        return requestCoverLetter;
+    }
+
+    public String getOtherDetails() {
+        return otherDetails;
+    }
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public Collection<Applications> getApplications() {
+        return applications;
+    }
+
     public void setJobTitle(String jobTitle) {
         this.jobTitle = jobTitle;
     }

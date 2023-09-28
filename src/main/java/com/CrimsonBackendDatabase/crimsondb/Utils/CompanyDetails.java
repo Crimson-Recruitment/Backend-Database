@@ -7,6 +7,7 @@ import java.util.List;
 
 @Getter
 public class CompanyDetails {
+    private Long companyId;
     private String companyName;
     private String field;
     private byte[] profileImage;
@@ -16,7 +17,8 @@ public class CompanyDetails {
     private String primaryPhoneNumber;
     private String secondaryPhoneNumber;
 
-    public CompanyDetails(String companyName, String field, String email, byte[] profileImage, List<CompanyImages> companyImages, String overview, String primaryPhoneNumber, String secondaryPhoneNumber) {
+    public CompanyDetails(Long companyId,String companyName, String field, String email, byte[] profileImage, List<CompanyImages> companyImages, String overview, String primaryPhoneNumber, String secondaryPhoneNumber) {
+        this.companyId = companyId;
         this.companyName = companyName;
         this.field = field;
         this.profileImage = profileImage;

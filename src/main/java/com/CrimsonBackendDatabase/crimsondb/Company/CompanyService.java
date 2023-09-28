@@ -71,7 +71,7 @@ public class CompanyService {
     public CompanyDetails getCompanyInfo(Long id) throws InvalidCompanyException {
         Optional<Company> company = companyRepository.findById(id);
         if(company.isPresent()){
-            return new CompanyDetails(company.get().getCompanyName(),company.get().getCategory(),company.get().getEmail(),company.get().getProfileImage(),new ArrayList<CompanyImages>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
+            return new CompanyDetails(company.get().getId(),company.get().getCompanyName(),company.get().getCategory(),company.get().getEmail(),company.get().getProfileImage(),new ArrayList<CompanyImages>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
         } else {
             throw new InvalidCompanyException();
         }

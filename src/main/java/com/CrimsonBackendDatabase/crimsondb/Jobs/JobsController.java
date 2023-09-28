@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/jobs")
+@RequestMapping("/jobs")
 public class JobsController {
     private final JobsService jobsService;
     @Autowired
@@ -27,17 +27,17 @@ public class JobsController {
         }
     }
     @GetMapping("/company-jobs/{id}")
-    public List<Jobs> getAllCompanyJobs(@PathVariable("id") Long id) {
+    public List<Jobs> getAllCompanyJobs(@PathVariable("id") Long id,@RequestHeader("Authorization") String accessToken) {
         try {
-            return jobsService.getAllCompanyJobs(id);
+            return jobsService.getAllCompanyJobs(id,accessToken);
         } catch (InvalidTokenException | InvalidCompanyException e) {
             throw new RuntimeException(e);
         }
     }
     @GetMapping("/company-jobs/field/{field}")
-    public List<Jobs> getJobsByField(@PathVariable("field")String field) {
+    public List<Jobs> getJobsByField(@PathVariable("field")String field, @RequestHeader("Authorization") String accessToken) {
         try {
-            return jobsService.getJobsByField(field);
+            return jobsService.getJobsByField(field,accessToken);
         } catch (InvalidTokenException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +56,7 @@ public class JobsController {
     public  HashMap<String, String> updateJob(@RequestHeader("Authorization") String accessToken, @RequestBody Jobs job, @PathVariable("jobId") Long jobId) {
         try {
             return jobsService.updateJob(jobId,job,accessToken);
-        } catch (InvalidTokenException e) {
+        } catch (InvalidTokenException | AccessDeniedException | InvalidJobException e) {
             throw new RuntimeException(e);
         }
     }
