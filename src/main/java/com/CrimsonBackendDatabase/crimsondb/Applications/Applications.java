@@ -2,6 +2,7 @@ package com.CrimsonBackendDatabase.crimsondb.Applications;
 
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -13,11 +14,14 @@ public class Applications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String status;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "job_id", referencedColumnName = "id")
     private Jobs job;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 
@@ -25,6 +29,9 @@ public class Applications {
         this.status = status;
         this.job = job;
         this.user = user;
+    }
+
+    public Applications() {
     }
 
     public void setStatus(String status) {

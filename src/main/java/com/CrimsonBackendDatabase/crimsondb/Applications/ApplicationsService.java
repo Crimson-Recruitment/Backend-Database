@@ -13,6 +13,7 @@ import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.Invali
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -37,11 +38,16 @@ public class ApplicationsService {
             if(isValid) {
                 Optional<Jobs> job = jobsRepository.findById(jobId);
                 if(job.isPresent()) {
-                    Applications application = new Applications("submitted",job.get(),userToken.get().getUsers());
-                    applicationsRepository.save(application);
-                    HashMap<String, String> data = new HashMap<String, String>();
-                    data.put("result", "success");
-                    return data;
+                    Optional<Applications> findApplication = applicationsRepository.findApplicationByUserAndJob(userToken.get().getUsers(), job.get());
+                    if(findApplication.isPresent()) {
+                        throw new CreateApplicationsException("You have already applied to this job!");
+                    } else {
+                        Applications application = new Applications("Submitted",job.get(),userToken.get().getUsers());
+                        applicationsRepository.save(application);
+                        HashMap<String, String> data = new HashMap<String, String>();
+                        data.put("result", "success");
+                        return data;
+                    }
                 } else {
                     throw new CreateApplicationsException("Job is either expired or invalid!");
                 }
@@ -68,6 +74,7 @@ public class ApplicationsService {
         }
     };
     // Company Functions
+    @Transactional
     public HashMap<String, String> updateApplicationStatus(Long id, String status,String accessToken) throws InvalidTokenException, InvalidApplicationException, AccessDeniedException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
@@ -95,6 +102,7 @@ public class ApplicationsService {
         }
     };
 
+    @Transactional
     public List<Applications> getAllCompanyApplications(String accessToken) throws InvalidTokenException {   Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
@@ -117,5 +125,7 @@ public class ApplicationsService {
         }
 
     }
+
+
 
 }

@@ -5,6 +5,7 @@ import com.CrimsonBackendDatabase.crimsondb.Applications.ApplicationsException.I
 import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.AccessDeniedException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.Status;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -14,10 +15,15 @@ import java.util.List;
 @RequestMapping("/applications")
 public class ApplicationsController {
     private ApplicationsService applicationsService;
-    @PostMapping("/create-application/{id}")
-    public HashMap<String, String> createApplication(@RequestHeader("Authorization") String accessToken, @PathVariable("id") Long id) {
+    @Autowired
+    public ApplicationsController(ApplicationsService applicationsService) {
+        this.applicationsService = applicationsService;
+    }
+
+    @PostMapping("/create-application/{jobId}")
+    public HashMap<String, String> createApplication(@RequestHeader("Authorization") String accessToken, @PathVariable("jobId") Long jobId) {
         try {
-            return  applicationsService.createApplication(accessToken,id);
+            return  applicationsService.createApplication(accessToken,jobId);
         } catch (InvalidTokenException | CreateApplicationsException e) {
             throw new RuntimeException(e);
         }
@@ -31,7 +37,7 @@ public class ApplicationsController {
         }
     }
 
-    @GetMapping("/update-application/{id}")
+    @PostMapping("/update-application/{id}")
     public HashMap<String, String> updateApplicationStatus(@PathVariable("id") Long id, @RequestBody Status status, @RequestHeader("Authorization") String accessToken) {
         try {
             return applicationsService.updateApplicationStatus(id, status.getStatus(),accessToken);
