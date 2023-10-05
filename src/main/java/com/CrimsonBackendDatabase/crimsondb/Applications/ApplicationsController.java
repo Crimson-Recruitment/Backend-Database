@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/applications")
+@CrossOrigin(origins = "*")
 public class ApplicationsController {
     private ApplicationsService applicationsService;
     @Autowired

@@ -15,6 +15,7 @@ import java.util.HashMap;
 
 @RestController
 @RequestMapping("/company")
+@CrossOrigin(origins = "*")
 public class CompanyController {
     private final CompanyService companyService;
     @Autowired
