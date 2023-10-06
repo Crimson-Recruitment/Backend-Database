@@ -40,11 +40,13 @@ public class CompanyController {
     }
     @GetMapping("/company-details")
     public Company getCompanyDetails(@RequestHeader("Authorization") String accessToken) {
+
         try {
             return companyService.getCompanyDetails(accessToken);
-        } catch (com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             throw new RuntimeException(e);
         }
+
     }
     @GetMapping("company-info/{id}")
     public CompanyDetails getCompanyInfo(@PathVariable("id") Long id) {
@@ -67,7 +69,7 @@ public class CompanyController {
     public HashMap<String, String> updateCompanyDetails(@RequestHeader("Authorization") String accessToken,@RequestBody Company company) {
         try {
             return companyService.updateCompanyDetails(accessToken, company);
-        } catch (com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             throw new RuntimeException(e);
         }
     }
@@ -75,25 +77,29 @@ public class CompanyController {
     public HashMap<String, String> changePassword(@RequestHeader("Authorization") String accessToken, @RequestBody PasswordChange passwordChange) {
         try {
             return  companyService.changePassword(accessToken,passwordChange);
-        } catch (AuthenticationException |
-                 com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
+        } catch (AuthenticationException | InvalidTokenException e) {
             throw new RuntimeException(e);
         }
+
     }
     @GetMapping("/validate-email")
     public HashMap<String, String> validateEmail(@RequestHeader("Authorization") String accessToken) {
+
         try {
             return companyService.validateEmail(accessToken);
-        } catch (com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             throw new RuntimeException(e);
         }
+
     }
     @GetMapping("/validate-phone-number")
     public HashMap<String, String> validatePrimaryPhoneNumber(@RequestHeader("Authorization") String accessToken) {
+
         try {
             return  companyService.validatePrimaryPhoneNumber(accessToken);
-        } catch (com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
+        } catch (InvalidTokenException e) {
             throw new RuntimeException(e);
         }
+
     }
 }

@@ -6,8 +6,7 @@ import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
-import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
-import com.CrimsonBackendDatabase.crimsondb.Users.Users;
+import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.CompanyDetails;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
@@ -78,22 +77,22 @@ public class CompanyService {
     }
 
     @Transactional
-    public Company getCompanyDetails(String accessToken) throws com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException {
+    public Company getCompanyDetails(String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
                 return companyToken.get().getCompany();
             } else {
-                throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
+                throw new InvalidTokenException();
             }
         } else {
-            throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
+            throw new InvalidTokenException();
         }
     }
 
     @Transactional
-    public HashMap<String, String> updateCompanyDetails(String accessToken, Company newCompany) throws com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException {
+    public HashMap<String, String> updateCompanyDetails(String accessToken, Company newCompany) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
@@ -117,10 +116,10 @@ public class CompanyService {
                 data.put("result", "success");
                 return data;
             } else {
-                throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
+                throw new InvalidTokenException();
             }
         } else {
-            throw new com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyTokenExceptions.InvalidTokenException();
+            throw new InvalidTokenException();
         }
 
     };

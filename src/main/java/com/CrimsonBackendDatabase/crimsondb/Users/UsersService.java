@@ -42,7 +42,7 @@ public class UsersService {
         }
     };
     @Transactional
-    public HashMap<String, String> userLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException {
+    public HashMap<String, String> userLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException, InvalidTokenException {
         Optional<Users> user = usersRepository.findUsersByEmail(email);
         if (user.isPresent()) {
             boolean val =  encoder.matches(password,user.get().getPassword());

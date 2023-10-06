@@ -1,7 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.UserToken;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
-import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
+import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -65,7 +65,7 @@ public class UserTokenService {
                 return  new_token;
             }
         } else {
-            throw  new InvalidTokenException("No Token mapped to this user!");
+            throw  new com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException();
         }
     }
 

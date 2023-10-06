@@ -62,6 +62,7 @@ public class Company implements Cloneable{
         this.password = password;
     }
 
+
     public CompanyToken getCompanyToken() {
         return companyToken;
     }

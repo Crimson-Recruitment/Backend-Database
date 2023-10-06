@@ -42,7 +42,8 @@ public class UsersController {
     public  HashMap<String,String> userLogin(@RequestBody LoginDetails loginDetails) {
         try {
             return userService.userLogin(loginDetails.getEmail(),loginDetails.getPassword());
-        } catch (InvalidTokenException | AuthenticationException e) {
+        } catch (InvalidTokenException | AuthenticationException |
+                 com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
             throw new RuntimeException(e);
         }
     }

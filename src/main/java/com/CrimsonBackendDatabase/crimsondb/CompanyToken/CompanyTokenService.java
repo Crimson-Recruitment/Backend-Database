@@ -64,7 +64,7 @@ public class CompanyTokenService {
                 return  new_token;
             }
         } else {
-            throw  new InvalidTokenException("No Token mapped to this user!");
+            throw  new InvalidTokenException();
         }
     }
 
