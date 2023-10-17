@@ -5,6 +5,7 @@ import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -17,14 +18,15 @@ public class Meetings {
     private Long id;
     private String joinUrl;
     private String agenda;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date startTime;
     private String timeZone;
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.DETACH)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name="user_id",referencedColumnName = "id")
     private Users user;
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.DETACH)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 

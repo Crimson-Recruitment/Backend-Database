@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Users;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
+import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
 import com.CrimsonBackendDatabase.crimsondb.UserMessages.UserMessages;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,9 +37,14 @@ public class Users implements Cloneable {
     @JsonIgnore
     @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
     private UserToken userToken;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<Meetings> meetings;
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UserMessages> userMessages;

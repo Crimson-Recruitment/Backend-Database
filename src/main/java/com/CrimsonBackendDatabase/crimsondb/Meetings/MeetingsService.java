@@ -27,6 +27,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
@@ -73,19 +74,19 @@ public class MeetingsService {
                 HttpResponse<String> response = null;
                 response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
                 HashMap<String, Object> body = null;
-                String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+                String DEFAULT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
                 int statusCode = 0;
                 DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
                 body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
                 Meetings meeting = new Meetings(
                         body.get("join_url").toString(),
                         body.get("agenda").toString(),
-                        formatter.parse(body.get("start_time").toString()),
-                        body.get("time_zone").toString(),
-                        user.get(),
-                        company
+                        Date.from(Instant.parse(body.get("start_time").toString())),
+                                body.get("timezone").toString(),
+                                user.get(),
+                                company
                         );
-                //meetingsRepository.save(meeting);
+                meetingsRepository.save(meeting);
                 HashMap<String,Object> result = new HashMap<>();
                 result.put("result","success");
                 return result;

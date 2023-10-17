@@ -4,6 +4,7 @@ import com.CrimsonBackendDatabase.crimsondb.CompanyImages.CompanyImages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
+import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
@@ -36,6 +37,10 @@ public class Company implements Cloneable{
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Collection<CompanyImages> companyImages;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "company",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Collection<Meetings> meetings;
     @JsonIgnore
     @OneToOne(mappedBy = "company",cascade = CascadeType.ALL)
     private CompanyToken companyToken;
