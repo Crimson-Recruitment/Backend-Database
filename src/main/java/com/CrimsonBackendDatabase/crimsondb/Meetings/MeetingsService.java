@@ -1,19 +1,27 @@
 package com.CrimsonBackendDatabase.crimsondb.Meetings;
 
+import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
+import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.ZoomAuthorizationException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.MeetingInfo;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +31,11 @@ import java.util.concurrent.TimeoutException;
 
 @Service
 public class MeetingsService {
+
+    @Value("${zoom.client.id}")
+    private String zoomClientId;
+    @Value("${zoom.client.secret}")
+    private String zoomClientSecret;
     private final CompanyTokenService companyTokenService;
     @Autowired
     public MeetingsService(CompanyTokenService companyTokenService) {
@@ -34,27 +47,24 @@ public class MeetingsService {
             .build();
 
     @Transactional
-    public HashMap<String, String> scheduleMeeting(String accessToken,MeetingInfo meetingInfo) throws InvalidTokenException {
+    public HashMap<String, Object> scheduleMeeting(String accessToken,MeetingInfo meetingInfo) throws InvalidTokenException, IOException, InterruptedException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if (companyToken.isPresent()) {
+            Company company = companyToken.get().getCompany();
             HttpRequest request = HttpRequest
                     .newBuilder(URI.create("https://api.zoom.us/v2/users/me/meetings"))
                     .header("Content-Type", "application/json")
-                    .header("Authorization","Bearer eyJzdiI6IjAwMDAwMSIsImFsZyI6IkhTNTEyIiwidiI6IjIuMCIsImtpZCI6ImFlM2RmYjIyLTM2YmUtNDQ4MC04NzM5LWZhYWQ5ODNlYzNhZSJ9.eyJ2ZXIiOjksImF1aWQiOiI2NDgzMjJmNmQzNDg2MzM3MzliZDY4ZTFiNzBhZTdjYSIsImNvZGUiOiJZVlV3VVUxUUNyblRMdTg1ZHR4UXNhbUZqZElva1VLVmciLCJpc3MiOiJ6bTpjaWQ6TWRPMVRKV0lSeXZVOGtQMld3Y2ciLCJnbm8iOjAsInR5cGUiOjAsInRpZCI6MCwiYXVkIjoiaHR0cHM6Ly9vYXV0aC56b29tLnVzIiwidWlkIjoiVW85OThOdHZSZ2llLVhfNkRHNFFmZyIsIm5iZiI6MTY5NjU5NDgzNywiZXhwIjoxNjk2NTk4NDM3LCJpYXQiOjE2OTY1OTQ4MzcsImFpZCI6Il9uajNWbkpWVE5PWFRFU2xzUXZZWWcifQ.xWT8absW6XnoGTv_Z61rgy7f3iof88v9GcaqtfwqW1WytpnIEf4_hWw2hLlxkC-JibQarUetD6yjty0CX5JmvA")
+                    .header("Authorization","Bearer "+company.getZoomAccessToken())
                     .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(meetingInfo)))
                     .build();
-            CompletableFuture<HttpResponse<String>> response = null;
-            response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-            String body = null;
+            HttpResponse<String> response = null;
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HashMap<String, Object> body = null;
             int statusCode = 0;
-            try{
-                body = response.thenApply(HttpResponse::body).get(5, TimeUnit.SECONDS);
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                throw new RuntimeException(e);
-            }
-            HashMap<String,String> result = new HashMap<String, String>();
+            body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
+            HashMap<String,Object> result = new HashMap<>();
             result.put("result","success");
-            result.put("more",body);
+            result.putAll(body);
             return result;
         } else {
             throw new InvalidTokenException();
@@ -67,30 +77,31 @@ public class MeetingsService {
         return null;
     };
     @Transactional
-    public HashMap<String,String> getCode(String accessToken, String code) throws InvalidTokenException {
+    public HashMap<String,String> getCode(String accessToken, String code) throws InvalidTokenException, ExecutionException, InterruptedException, IOException, ZoomAuthorizationException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if (companyToken.isPresent()) {
-            HashMap<String,String> bod = new HashMap<String,String>();
-            bod.put("device_code",companyToken.get().getCompany().getZoomCode());
-            bod.put("grant_type","urn:ietf:params:oauth:grant-type:device_code");
-            HttpRequest request = HttpRequest
+            Company company = companyToken.get().getCompany();
+            String urlParameters = "code="+code+"&grant_type=authorization_code&redirect_uri=http://127.0.0.1:8081/meeting/get-code";
+            HttpRequest zoomAuth = HttpRequest
                     .newBuilder(URI.create("https://zoom.us/oauth/token"))
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(bod)))
+                    .header("Authorization","Basic "+ Base64.getEncoder().encodeToString((zoomClientId+":"+zoomClientSecret).getBytes()))
+                    .POST(HttpRequest.BodyPublishers.ofString(urlParameters))
                     .build();
-            CompletableFuture<HttpResponse<String>> response = null;
-            response = httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-            String body = null;
+            HttpResponse<String> response = null;
+            response = httpClient.send(zoomAuth, HttpResponse.BodyHandlers.ofString());
+            HashMap<String, String> body = null;
             int statusCode = 0;
-            try{
-                body = response.thenApply(HttpResponse::body).get(5, TimeUnit.SECONDS);
-            } catch (ExecutionException | InterruptedException | TimeoutException e) {
-                throw new RuntimeException(e);
+            body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, String>>(){}.getType());
+            if(body.get("error") == null) {
+                company.setZoomAccessToken(body.get("access_token"));
+                company.setZoomRefreshToken(body.get("refresh_token"));
+                HashMap<String,String> result = new HashMap<String, String>();
+                result.put("result","success");
+                return result;
+            } else {
+                throw new ZoomAuthorizationException("Zoom Error: "+body.get("error")+" Reason: "+body.get("reason"));
             }
-            companyToken.get().getCompany().setZoomCode(code);
-            HashMap<String,String> result = new HashMap<String, String>();
-            result.put("result","success");
-            return result;
         } else {
             throw new InvalidTokenException();
         }

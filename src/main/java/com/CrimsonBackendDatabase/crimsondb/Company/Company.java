@@ -28,7 +28,10 @@ public class Company implements Cloneable{
     private String tier;
     private String overview;
     private String password;
-    private String zoomCode;
+    @Column(length = 2048)
+    private String zoomAccessToken;
+    @Column(length = 2048)
+    private String zoomRefreshToken;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -71,12 +74,20 @@ public class Company implements Cloneable{
         return overview;
     }
 
-    public String getZoomCode() {
-        return zoomCode;
+    public String getZoomAccessToken() {
+        return zoomAccessToken;
     }
 
-    public void setZoomCode(String zoomCode) {
-        this.zoomCode = zoomCode;
+    public String getZoomRefreshToken() {
+        return zoomRefreshToken;
+    }
+
+    public void setZoomRefreshToken(String zoomRefreshToken) {
+        this.zoomRefreshToken = zoomRefreshToken;
+    }
+
+    public void setZoomAccessToken(String zoomAccessToken) {
+        this.zoomAccessToken = zoomAccessToken;
     }
 
     public void setOverview(String overview) {
