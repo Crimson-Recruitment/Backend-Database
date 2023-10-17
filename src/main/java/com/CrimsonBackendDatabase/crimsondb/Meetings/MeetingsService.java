@@ -5,6 +5,9 @@ import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.ZoomAuthorizationException;
+import com.CrimsonBackendDatabase.crimsondb.Users.Users;
+import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
+import com.CrimsonBackendDatabase.crimsondb.Users.UsersRepository;
 import com.CrimsonBackendDatabase.crimsondb.Utils.MeetingInfo;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,8 +23,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -37,9 +44,13 @@ public class MeetingsService {
     @Value("${zoom.client.secret}")
     private String zoomClientSecret;
     private final CompanyTokenService companyTokenService;
+    private final UsersRepository usersRepository;
+    private final MeetingsRepository meetingsRepository;
     @Autowired
-    public MeetingsService(CompanyTokenService companyTokenService) {
+    public MeetingsService(CompanyTokenService companyTokenService, UsersRepository usersRepository, MeetingsRepository meetingsRepository) {
         this.companyTokenService = companyTokenService;
+        this.usersRepository = usersRepository;
+        this.meetingsRepository = meetingsRepository;
     }
     private static final HttpClient httpClient = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
@@ -47,25 +58,40 @@ public class MeetingsService {
             .build();
 
     @Transactional
-    public HashMap<String, Object> scheduleMeeting(String accessToken,MeetingInfo meetingInfo) throws InvalidTokenException, IOException, InterruptedException {
+    public HashMap<String, Object> scheduleMeeting(String accessToken,MeetingInfo meetingInfo, Long userId) throws InvalidTokenException, IOException, InterruptedException, InvalidUserException, ParseException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if (companyToken.isPresent()) {
-            Company company = companyToken.get().getCompany();
-            HttpRequest request = HttpRequest
-                    .newBuilder(URI.create("https://api.zoom.us/v2/users/me/meetings"))
-                    .header("Content-Type", "application/json")
-                    .header("Authorization","Bearer "+company.getZoomAccessToken())
-                    .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(meetingInfo)))
-                    .build();
-            HttpResponse<String> response = null;
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            HashMap<String, Object> body = null;
-            int statusCode = 0;
-            body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
-            HashMap<String,Object> result = new HashMap<>();
-            result.put("result","success");
-            result.putAll(body);
-            return result;
+            Optional<Users> user = usersRepository.findById(userId);
+            if(user.isPresent()) {
+                Company company = companyToken.get().getCompany();
+                HttpRequest request = HttpRequest
+                        .newBuilder(URI.create("https://api.zoom.us/v2/users/me/meetings"))
+                        .header("Content-Type", "application/json")
+                        .header("Authorization","Bearer "+company.getZoomAccessToken())
+                        .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(meetingInfo)))
+                        .build();
+                HttpResponse<String> response = null;
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                HashMap<String, Object> body = null;
+                String DEFAULT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+                int statusCode = 0;
+                DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
+                body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
+                Meetings meeting = new Meetings(
+                        body.get("join_url").toString(),
+                        body.get("agenda").toString(),
+                        formatter.parse(body.get("start_time").toString()),
+                        body.get("time_zone").toString(),
+                        user.get(),
+                        company
+                        );
+                //meetingsRepository.save(meeting);
+                HashMap<String,Object> result = new HashMap<>();
+                result.put("result","success");
+                return result;
+            } else {
+                throw new InvalidUserException();
+            }
         } else {
             throw new InvalidTokenException();
         }
