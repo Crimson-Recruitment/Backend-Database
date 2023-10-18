@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Meetings;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
+import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -21,6 +22,11 @@ public class Meetings {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date startTime;
     private String timeZone;
+
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name="job_id",referencedColumnName = "id")
+    private Jobs job;
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name="user_id",referencedColumnName = "id")

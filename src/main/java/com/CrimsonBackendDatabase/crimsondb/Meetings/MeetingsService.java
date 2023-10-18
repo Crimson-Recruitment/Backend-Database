@@ -4,6 +4,7 @@ import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
+import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.InvalidMeetingException;
 import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.ZoomAuthorizationException;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
@@ -100,9 +101,20 @@ public class MeetingsService {
     };
 
     @Transactional
-    public Meetings getMeetingDetails(){
-        return null;
+    public Meetings getMeetingDetails(String accessToken, Long meetingId) throws InvalidMeetingException, InvalidTokenException {
+        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
+        if(companyToken.isPresent()) {
+            Optional<Meetings> meeting = meetingsRepository.findById(meetingId);
+            if(meeting.isPresent()) {
+                return meeting.get();
+            } else {
+                throw new InvalidMeetingException("Meeting with Id "+meetingId+" doesn't exist!");
+            }
+        } else {
+            throw new InvalidTokenException();
+        }
     };
+
     @Transactional
     public HashMap<String,String> getCode(String accessToken, String code) throws InvalidTokenException, ExecutionException, InterruptedException, IOException, ZoomAuthorizationException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);

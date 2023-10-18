@@ -2,6 +2,7 @@ package com.CrimsonBackendDatabase.crimsondb.Jobs;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
+import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,9 @@ public class Jobs implements Cloneable {
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
+    private Collection<Meetings> meetings;
+
 
     public Jobs() {
     }

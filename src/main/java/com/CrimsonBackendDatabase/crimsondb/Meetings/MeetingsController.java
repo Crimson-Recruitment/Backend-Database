@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Meetings;
 
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
+import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.InvalidMeetingException;
 import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.ZoomAuthorizationException;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.MeetingInfo;
@@ -35,8 +36,12 @@ public class MeetingsController {
     }
 
     @GetMapping("/meeting-info/{meetingId}")
-    public ResponseEntity<Meetings> getMeetingInfo() {
-        return new ResponseEntity<Meetings>(meetingsService.getMeetingDetails(), HttpStatus.OK);
+    public ResponseEntity<Meetings> getMeetingInfo(@RequestHeader("Authorization") String accessToken, @PathVariable("meetingId") Long id) {
+        try {
+            return new ResponseEntity<Meetings>(meetingsService.getMeetingDetails(accessToken, id), HttpStatus.OK);
+        } catch (InvalidMeetingException | InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/get-code")
