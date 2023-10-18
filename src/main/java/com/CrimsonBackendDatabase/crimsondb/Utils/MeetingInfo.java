@@ -15,15 +15,14 @@ public class MeetingInfo {
     private int duration;
     private boolean pre_schedule;
     private List<HashMap<String,String>> meeting_invitees;
-    @DateTimeFormat(pattern = "YYYY-mm-dd'T'HH:mm:ss'Z'")
-    private Date start_time;
+    private String start_time;
     private String timezone;
     private String topic;
 
     public MeetingInfo() {
     }
 
-    public MeetingInfo(String agenda, boolean defaultPassword, int duration,String password, boolean pre_schedule, List<HashMap<String, String>> meeting_invitees, Date start_time, String timezone, String topic) {
+    public MeetingInfo(String agenda, boolean defaultPassword, int duration,String password, boolean pre_schedule, List<HashMap<String, String>> meeting_invitees, String start_time, String timezone, String topic) {
         this.agenda = agenda;
         this.defaultPassword = defaultPassword;
         this.password = password;
@@ -83,11 +82,11 @@ public class MeetingInfo {
         this.meeting_invitees = meeting_invitees;
     }
 
-    public Date getStart_time() {
+    public String getStart_time() {
         return start_time;
     }
 
-    public void setStart_time(Date start_time) {
+    public void setStart_time(String start_time) {
         this.start_time = start_time;
     }
 
