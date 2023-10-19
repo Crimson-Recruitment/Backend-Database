@@ -1,5 +1,8 @@
 package com.CrimsonBackendDatabase.crimsondb.Utils;
 
+import lombok.Getter;
+
+@Getter
 public class PaymentDetails {
     private String amount;
     private String transactionName;
@@ -16,8 +19,10 @@ public class PaymentDetails {
     private String billingCountry;
     private String narration;
     private String mobilePaymentType;
+    private String phoneNumber = "";
+    private String email = "";
 
-    public PaymentDetails(String transactionName, String paymentType, String amount, String currency, String country, String firstName, String narration, String mobilePaymentType) {
+    public PaymentDetails(String transactionName, String paymentType, String amount, String currency, String country, String firstName, String narration, String mobilePaymentType, String phoneNumber,String email) {
         this.amount = amount;
         this.currency = currency;
         this.country = country;
@@ -26,6 +31,8 @@ public class PaymentDetails {
         this.mobilePaymentType = mobilePaymentType;
         this.transactionName = transactionName;
         this.paymentType = paymentType;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
     }
 
     public PaymentDetails(String transactionName, String paymentType, String amount, String cardNo, String cvv, String expiryMonth, String currency, String country, String firstName, String pin, String billingAddress, String billingCity, String billingCountry) {
@@ -43,4 +50,5 @@ public class PaymentDetails {
         this.transactionName = transactionName;
         this.paymentType = paymentType;
     }
+
 }
