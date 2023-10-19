@@ -6,13 +6,13 @@ import lombok.Getter;
 public class UserDetails {
     private String firstName;
     private String lastName;
-    private byte[] profileImage;
+    private String profileImage;
     private String phoneNumber;
     private String email;
     private String location;
-    private byte[] cv;
+    private String cv;
 
-    public UserDetails(String firstName, String lastName, byte[] profileImage, String phoneNumber, String email, String location, byte[] cv) {
+    public UserDetails(String firstName, String lastName, String profileImage, String phoneNumber, String email, String location, String cv) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.profileImage = profileImage;
@@ -31,7 +31,7 @@ public class UserDetails {
         this.lastName = lastName;
     }
 
-    public void setProfileImage(byte[] profileImage) {
+    public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
 
@@ -47,7 +47,7 @@ public class UserDetails {
         this.location = location;
     }
 
-    public void setCv(byte[] cv) {
+    public void setCv(String cv) {
         this.cv = cv;
     }
 }

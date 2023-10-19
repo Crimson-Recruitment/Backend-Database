@@ -26,7 +26,7 @@ public class UsersService {
     public UsersService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
-    @Transactional
+
     public HashMap<String, String> userRegister(Users user) throws EmailAlreadyExistsException {
         Optional<Users> checkUser = usersRepository.findUsersByEmail(user.getEmail());
         if(checkUser.isPresent()) {
@@ -41,7 +41,7 @@ public class UsersService {
             return result;
         }
     };
-    @Transactional
+
     public HashMap<String, String> userLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException, InvalidTokenException {
         Optional<Users> user = usersRepository.findUsersByEmail(email);
         if (user.isPresent()) {
@@ -61,7 +61,6 @@ public class UsersService {
 
     };
 
-    @Transactional
     public Users getUserDetails(String accessToken) throws InvalidTokenException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
@@ -124,7 +123,6 @@ public class UsersService {
 
     };
 
-    @Transactional
     public HashMap<String, String> getAccessToken(String email) throws InvalidUserException {
         Optional<Users> user = usersRepository.findUsersByEmail(email);
         if(user.isPresent()) {
@@ -159,7 +157,7 @@ public class UsersService {
         }
     }
 
-    @Transactional
+
     public HashMap<String, String> validateEmail(String accessToken) throws InvalidTokenException {
         Optional<UserToken> session = userTokenService.findUserToken(accessToken);
         if(session.isPresent()) {
@@ -178,7 +176,7 @@ public class UsersService {
         }
     };
 
-    @Transactional
+
     public HashMap<String, String> validatePassword(String accessToken) throws InvalidTokenException {
         Optional<UserToken> session = userTokenService.findUserToken(accessToken);
         if(session.isPresent()) {

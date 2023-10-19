@@ -1,5 +1,6 @@
 package com.CrimsonBackendDatabase.crimsondb.Meetings;
 
+import com.CrimsonBackendDatabase.crimsondb.Applications.ApplicationsException.InvalidApplicationException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.InvalidMeetingException;
 import com.CrimsonBackendDatabase.crimsondb.Meetings.MeetingsException.ZoomAuthorizationException;
@@ -24,12 +25,13 @@ public class MeetingsController {
     public MeetingsController(MeetingsService meetingsService) {
         this.meetingsService = meetingsService;
     }
-    @PostMapping("/schedule-meeting/{userId}")
-    public HashMap<String, Object> scheduleMeeting(@RequestHeader("Authorization") String accessToken,@RequestBody MeetingInfo meetingInfo,@PathVariable("userId") Long userId){
+    @PostMapping("/schedule-meeting/{applicationId}")
+    public HashMap<String, Object> scheduleMeeting(@RequestHeader("Authorization") String accessToken,@RequestBody MeetingInfo meetingInfo,@PathVariable("applicationId") Long applicationId){
 
         try {
-            return meetingsService.scheduleMeeting(accessToken,meetingInfo, userId);
-        } catch (InvalidTokenException | IOException | InterruptedException | InvalidUserException | ParseException e) {
+            return meetingsService.scheduleMeeting(accessToken,meetingInfo, applicationId);
+        } catch (InvalidTokenException | IOException | InterruptedException | ParseException |
+                 InvalidApplicationException e) {
             throw new RuntimeException(e);
         }
 
@@ -40,6 +42,15 @@ public class MeetingsController {
         try {
             return new ResponseEntity<Meetings>(meetingsService.getMeetingDetails(accessToken, id), HttpStatus.OK);
         } catch (InvalidMeetingException | InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/refresh_token")
+    public HashMap<String,String> refreshZoomAccessToken(@RequestHeader("Authorization") String accessToken) {
+        try {
+            return meetingsService.refreshAccessToken(accessToken);
+        } catch (InvalidTokenException | IOException | InterruptedException | ZoomAuthorizationException e) {
             throw new RuntimeException(e);
         }
     }

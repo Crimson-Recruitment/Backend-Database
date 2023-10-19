@@ -31,6 +31,7 @@ public class ApplicationsService {
         this.companyTokenService = companyTokenService;
     }
     // User Functions
+    @Transactional
     public HashMap<String, String> createApplication(String accessToken, Long jobId) throws InvalidTokenException, CreateApplicationsException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
@@ -58,6 +59,8 @@ public class ApplicationsService {
             throw new InvalidTokenException();
         }
     };
+
+    @Transactional
     public List<Applications> getAllUserApplications(String accessToken) throws InvalidTokenException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {

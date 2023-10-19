@@ -24,10 +24,12 @@ public class Users implements Cloneable {
     private String email;
     private String location;
     private boolean emailValid;
-    @Lob
-    private byte[] profileImage;
-    @Lob
-    private byte[] cv;
+
+    @Column(length = 2048)
+    private String profileImage;
+
+    @Column(length = 2048)
+    private String cv;
     private String password;
     private String jobTitle;
     private String bio;
@@ -41,10 +43,6 @@ public class Users implements Cloneable {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Collection<Meetings> meetings;
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UserMessages> userMessages;
@@ -52,7 +50,7 @@ public class Users implements Cloneable {
     public Users() {
     }
 
-    public Users(String firstName, String lastName, String phoneNumber, String email, byte[] profileImage, byte[] cv, String jobTitle, String bio, List<String> skills, String tier) {
+    public Users(String firstName, String lastName, String phoneNumber, String email, String profileImage, String cv, String jobTitle, String bio, List<String> skills, String tier) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -99,11 +97,11 @@ public class Users implements Cloneable {
         return emailValid;
     }
 
-    public byte[] getProfileImage() {
+    public String getProfileImage() {
         return profileImage;
     }
 
-    public byte[] getCv() {
+    public String getCv() {
         return cv;
     }
 
@@ -168,10 +166,10 @@ public class Users implements Cloneable {
     public void setEmailValid(boolean emailValid) {
         this.emailValid = emailValid;
     }
-    public void setProfileImage(byte[] profileImage) {
+    public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
-    public void setCv(byte[] cv) {
+    public void setCv(String cv) {
         this.cv = cv;
     }
     public void setJobTitle(String jobTitle) {

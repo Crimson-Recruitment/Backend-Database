@@ -42,10 +42,9 @@ public class Jobs implements Cloneable {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL)
-    private Collection<Meetings> meetings;
 
 
     public Jobs() {

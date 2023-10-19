@@ -1,7 +1,6 @@
 package com.CrimsonBackendDatabase.crimsondb.Company;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCompanyException;
-import com.CrimsonBackendDatabase.crimsondb.CompanyImages.CompanyImages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
@@ -31,7 +30,7 @@ public class CompanyService {
     public CompanyService(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
     }
-    @Transactional
+
     public HashMap<String, String> companyRegister(Company company) throws EmailAlreadyExistsException {
         Optional<Company> checkCompany = companyRepository.findCompanyByEmail(company.getEmail());
         if(checkCompany.isPresent()) {
@@ -46,7 +45,7 @@ public class CompanyService {
             return result;
         }
     };
-    @Transactional
+
     public HashMap<String, String> companyLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException {
         Optional<Company> user = companyRepository.findCompanyByEmail(email);
         if (user.isPresent()) {
@@ -66,17 +65,16 @@ public class CompanyService {
 
     };
 
-    @Transactional
     public CompanyDetails getCompanyInfo(Long id) throws InvalidCompanyException {
         Optional<Company> company = companyRepository.findById(id);
         if(company.isPresent()){
-            return new CompanyDetails(company.get().getId(),company.get().getCompanyName(),company.get().getCategory(),company.get().getEmail(),company.get().getProfileImage(),new ArrayList<CompanyImages>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
+            return new CompanyDetails(company.get().getId(),company.get().getCompanyName(),company.get().getCategory(),company.get().getEmail(),company.get().getProfileImage(),new ArrayList<String>(company.get().getCompanyImages()),company.get().getOverview(),company.get().getPrimaryPhoneNumber(),company.get().getSecondaryPhoneNumber());
         } else {
             throw new InvalidCompanyException();
         }
     }
 
-    @Transactional
+
     public Company getCompanyDetails(String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
@@ -123,7 +121,7 @@ public class CompanyService {
         }
 
     };
-    @Transactional
+
     public HashMap<String, String> getAccessToken(String email) throws InvalidUserException {
         Optional<Company> company = companyRepository.findCompanyByEmail(email);
         if(company.isPresent()) {
@@ -157,7 +155,7 @@ public class CompanyService {
         }
     }
 
-    @Transactional
+
     public HashMap<String, String> validateEmail(String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> session = companyTokenService.findCompanyToken(accessToken);
         if(session.isPresent()) {
@@ -176,7 +174,7 @@ public class CompanyService {
         }
     };
 
-    @Transactional
+
     public HashMap<String, String> validatePrimaryPhoneNumber(String accessToken) throws InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
