@@ -6,8 +6,11 @@ import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PaymentDetails;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.flutterwave.rave.java.payload.*;
 import com.flutterwave.rave.java.entry.*;
@@ -17,7 +20,12 @@ import java.util.*;
 
 @Service
 public class PaymentsService {
+    @Value("${fl.public_key}")
     private String flPublicKey;
+    @Value("${fl.encryption_key}")
+    private String flEncryptionKey;
+    @Value("${fl.secret_key}")
+    private String flSecretKey;
     private final UserTokenService userTokenService;
     private final CompanyTokenService companyTokenService;
     private final PaymentsRepository paymentsRepository;
@@ -27,7 +35,7 @@ public class PaymentsService {
         this.userTokenService = userTokenService;
         this.paymentsRepository = paymentsRepository;
     }
-    public HashMap<String, String> userSubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException {
+    public HashMap<String, Object> userSubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
@@ -36,15 +44,20 @@ public class PaymentsService {
                 String userPhoneNumber = "";
                 if(Objects.equals(paymentDetails.getEmail(), "") || Objects.equals(paymentDetails.getEmail() ,null)) {
                     userEmail = userToken.get().getUsers().getEmail();
+                } else {
+                    userEmail = paymentDetails.getEmail();
                 }
                 if (Objects.equals(paymentDetails.getPhoneNumber(), "") ||Objects.equals(paymentDetails.getPhoneNumber(), null)) {
                     userPhoneNumber = userToken.get().getUsers().getPhoneNumber();
+                } else {
+                    userPhoneNumber = paymentDetails.getPhoneNumber();
                 }
                 if(paymentDetails.getPaymentType().equalsIgnoreCase("card")) {
                     String result = cardPayment(
                             paymentDetails.getCardNo(),
                             paymentDetails.getCvv(),
                             paymentDetails.getExpiryMonth(),
+                            paymentDetails.getExpiryYear(),
                             paymentDetails.getCurrency(),
                             paymentDetails.getCountry(),
                             paymentDetails.getAmount(),
@@ -56,11 +69,10 @@ public class PaymentsService {
                             paymentDetails.getBillingCity(),
                             paymentDetails.getBillingCountry()
                     );
-                    HashMap<String, String> data = new HashMap<String, String>();
+                    HashMap<String, Object> data = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
                     data.put("result", "success");
-                    data.put("Message",result);
                     return data;
-                }else if(paymentDetails.getPaymentType().equalsIgnoreCase("phonenumber")) {
+                }else if(paymentDetails.getPaymentType().equalsIgnoreCase("mobilemoney")) {
                     String result = mobileMoneyPayment(
                             paymentDetails.getCurrency(),
                             paymentDetails.getAmount(),
@@ -71,7 +83,7 @@ public class PaymentsService {
                             paymentDetails.getCountry(),
                             paymentDetails.getMobilePaymentType()
                     );
-                    HashMap<String, String> data = new HashMap<String, String>();
+                    HashMap<String, Object> data  = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
                     data.put("result", "success");
                     data.put("Message",result);
                     return data;
@@ -86,7 +98,7 @@ public class PaymentsService {
             throw new InvalidTokenException();
         }
     };
-    public HashMap<String, String> companySubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException {
+    public HashMap<String, Object> companySubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
@@ -95,15 +107,20 @@ public class PaymentsService {
                 String userPhoneNumber = "";
                 if(Objects.equals(paymentDetails.getEmail(), "") || Objects.equals(paymentDetails.getEmail() ,null)) {
                     userEmail = companyToken.get().getCompany().getEmail();
+                } else {
+                    userEmail = paymentDetails.getEmail();
                 }
                 if (Objects.equals(paymentDetails.getPhoneNumber(), "") ||Objects.equals(paymentDetails.getPhoneNumber(), null)) {
                     userPhoneNumber = companyToken.get().getCompany().getPrimaryPhoneNumber();
+                } else {
+                    userPhoneNumber = paymentDetails.getPhoneNumber();
                 }
                 if(paymentDetails.getPaymentType().equalsIgnoreCase("card")) {
                     String result = cardPayment(
                             paymentDetails.getCardNo(),
                             paymentDetails.getCvv(),
                             paymentDetails.getExpiryMonth(),
+                            paymentDetails.getExpiryYear(),
                             paymentDetails.getCurrency(),
                             paymentDetails.getCountry(),
                             paymentDetails.getAmount(),
@@ -115,9 +132,22 @@ public class PaymentsService {
                             paymentDetails.getBillingCity(),
                             paymentDetails.getBillingCountry()
                     );
-                    HashMap<String, String> data = new HashMap<String, String>();
+                    HashMap<String, Object> data = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
                     data.put("result", "success");
-                    data.put("Message",result);
+                    return data;
+                }else if(paymentDetails.getPaymentType().equalsIgnoreCase("mobilemoney")) {
+                    String result = mobileMoneyPayment(
+                            paymentDetails.getCurrency(),
+                            paymentDetails.getAmount(),
+                            userPhoneNumber,
+                            userEmail,
+                            paymentDetails.getFirstName(),
+                            paymentDetails.getNarration(),
+                            paymentDetails.getCountry(),
+                            paymentDetails.getMobilePaymentType()
+                    );
+                    HashMap<String, Object> data  = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
+                    data.put("result", "success");
                     return data;
                 }else {
                     throw new InvalidPaymentTypeException();
@@ -162,6 +192,7 @@ public class PaymentsService {
             String cardNo,
             String cvv,
             String expiryMonth,
+            String expiryYear,
             String currency,
             String country,
             String amount,
@@ -179,10 +210,13 @@ public class PaymentsService {
         cardload.setCardno(cardNo);
         cardload.setCvv(cvv);
         cardload.setExpirymonth(expiryMonth);
+        cardload.setExpiryyear(expiryYear);
         cardload.setCurrency(currency);
         cardload.setCountry(country);
         cardload.setAmount(amount);
         cardload.setEmail(email);
+        cardload.setSecret_key(flSecretKey);
+        cardload.setEncryption_key(flEncryptionKey);
         cardload.setPhonenumber(phoneNumber);
         cardload.setFirstname(firstName);
 
@@ -252,7 +286,11 @@ public class PaymentsService {
         mobilemoneyPayload.setEmail(email);
         mobilemoneyPayload.setFirstname(firstName);
         mobilemoneyPayload.setNetwork(narration);
+        mobilemoneyPayload.setEncryption_key(flEncryptionKey);
+        mobilemoneyPayload.setSecret_key(flSecretKey);
         mobilemoneyPayload.setCountry(country);
+        mobilemoneyPayload.setPublic_key(flPublicKey);
+        mobilemoneyPayload.setIs_mobile_money_ug(1);
         mobilemoneyPayload.setPayment_type(paymentType);
       //if split payment set subaccount values
 

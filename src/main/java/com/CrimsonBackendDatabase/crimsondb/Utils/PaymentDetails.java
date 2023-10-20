@@ -19,10 +19,14 @@ public class PaymentDetails {
     private String billingCountry;
     private String narration;
     private String mobilePaymentType;
+    private String expiryYear;
     private String phoneNumber = "";
     private String email = "";
 
-    public PaymentDetails(String transactionName, String paymentType, String amount, String currency, String country, String firstName, String narration, String mobilePaymentType, String phoneNumber,String email) {
+    public PaymentDetails() {
+    }
+
+    public PaymentDetails(String transactionName, String paymentType, String amount, String currency, String country, String firstName, String narration, String mobilePaymentType, String phoneNumber, String email) {
         this.amount = amount;
         this.currency = currency;
         this.country = country;
@@ -35,7 +39,7 @@ public class PaymentDetails {
         this.email = email;
     }
 
-    public PaymentDetails(String transactionName, String paymentType, String amount, String cardNo, String cvv, String expiryMonth, String currency, String country, String firstName, String pin, String billingAddress, String billingCity, String billingCountry) {
+    public PaymentDetails(String transactionName, String expiryYear, String paymentType, String amount, String cardNo, String cvv, String expiryMonth, String currency, String country, String firstName, String pin, String billingAddress, String billingCity, String billingCountry) {
         this.amount = amount;
         this.cardNo = cardNo;
         this.cvv = cvv;
@@ -43,6 +47,7 @@ public class PaymentDetails {
         this.currency = currency;
         this.country = country;
         this.firstName = firstName;
+        this.expiryYear = expiryYear;
         this.pin = pin;
         this.billingAddress = billingAddress;
         this.billingCity = billingCity;

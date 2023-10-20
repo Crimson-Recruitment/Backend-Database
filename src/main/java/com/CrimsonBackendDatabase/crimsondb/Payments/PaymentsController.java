@@ -20,7 +20,7 @@ public class PaymentsController {
         this.paymentsService = paymentsService;
     }
     @PostMapping("/user-subscribe")
-    public HashMap<String, String> userSubscribe(@RequestHeader("Authorization") String accessToken, @RequestBody PaymentDetails paymentDetails) {
+    public HashMap<String, Object> userSubscribe(@RequestHeader("Authorization") String accessToken, @RequestBody PaymentDetails paymentDetails) {
         try {
             return paymentsService.userSubscribe(accessToken,paymentDetails);
         } catch (InvalidTokenException | UnknownHostException | InvalidPaymentTypeException e) {
@@ -29,7 +29,7 @@ public class PaymentsController {
     }
 
     @PostMapping("/company-subscribe")
-    public HashMap<String, String> companySubscribe(@RequestHeader("Authorization") String accessToken, PaymentDetails paymentDetails) {
+    public HashMap<String, Object> companySubscribe(@RequestHeader("Authorization") String accessToken,@RequestBody PaymentDetails paymentDetails) {
         try {
             return paymentsService.companySubscribe(accessToken,paymentDetails);
         } catch (InvalidTokenException | UnknownHostException | InvalidPaymentTypeException e) {
