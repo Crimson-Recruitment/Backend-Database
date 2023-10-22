@@ -49,7 +49,7 @@ public class PaymentsController {
         }
     }
 
-    @GetMapping("/confirm-user-payment")
+    @GetMapping("/confirm-company-payment")
     public HashMap<String, Object> confirmCompanyPayments(@RequestParam("resp") String response, @RequestParam("accessCode") String accessToken) {
         try {
             return paymentsService.confirmCompanyPayments(response, accessToken);
