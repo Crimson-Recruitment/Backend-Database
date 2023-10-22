@@ -2,6 +2,7 @@ package com.CrimsonBackendDatabase.crimsondb.Payments;
 
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidPaymentTypeException;
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidTierTypeException;
+import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.PaymentNotFoundException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PaymentDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +41,21 @@ public class PaymentsController {
     }
 
     @GetMapping("/confirm-user-payment")
-    public HashMap<String, Object> confirmPayments(@RequestParam("resp") String response, @r) {
-     return paymentsService.confirmUserPayments(response);
+    public HashMap<String, Object> confirmUserPayments(@RequestParam("resp") String response, @RequestParam("accessCode") String accessToken) {
+        try {
+            return paymentsService.confirmUserPayments(response, accessToken);
+        } catch (PaymentNotFoundException | InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @GetMapping("/response")
-    public HashMap<String, Object> confirmPayments(@RequestParam("resp") String response) {
-        return paymentsService.confirmPayments(response);
+    @GetMapping("/confirm-user-payment")
+    public HashMap<String, Object> confirmCompanyPayments(@RequestParam("resp") String response, @RequestParam("accessCode") String accessToken) {
+        try {
+            return paymentsService.confirmCompanyPayments(response, accessToken);
+        } catch (PaymentNotFoundException | InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
