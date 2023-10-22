@@ -15,24 +15,33 @@ public class Payments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private final String amount;
-    private final String payerType;
-    private final Long payerId;
-    private final String transactionName;
-    private final String paymentType;
+    private String amount;
+    private String payerType;
+    private Long payerId;
+    private String transactionName;
+    private String paymentRef;
+    private String status;
+    private String paymentType;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private final Date expiryDate;
+    private Date expiryDate;
 
-    public Payments(String amount, String payerType, Long payerId, String transactionName, String paymentType) {
+    public Payments() {
+    }
+
+    public Payments(String amount, String payerType, Long payerId, String transactionName, String paymentType, String paymentRef, String status) {
         this.amount = amount;
         this.payerType = payerType;
         this.payerId = payerId;
         this.transactionName = transactionName;
         this.paymentType = paymentType;
+        this.paymentRef = paymentRef;
+        this.status = status;
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 1);
         expiryDate = Date.from(calendar.toInstant());
     }
 
-
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

@@ -1,5 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Payments;
 
+import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidPaymentTypeException;
+import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidTierTypeException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PaymentDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class PaymentsController {
     public HashMap<String, Object> userSubscribe(@RequestHeader("Authorization") String accessToken, @RequestBody PaymentDetails paymentDetails) {
         try {
             return paymentsService.userSubscribe(accessToken,paymentDetails);
-        } catch (InvalidTokenException | UnknownHostException | InvalidPaymentTypeException e) {
+        } catch (InvalidTokenException | UnknownHostException | InvalidPaymentTypeException | InvalidTierTypeException e) {
             throw new RuntimeException(e);
         }
     }
@@ -32,10 +34,21 @@ public class PaymentsController {
     public HashMap<String, Object> companySubscribe(@RequestHeader("Authorization") String accessToken,@RequestBody PaymentDetails paymentDetails) {
         try {
             return paymentsService.companySubscribe(accessToken,paymentDetails);
-        } catch (InvalidTokenException | UnknownHostException | InvalidPaymentTypeException e) {
+        } catch (InvalidTokenException | UnknownHostException | InvalidPaymentTypeException | InvalidTierTypeException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @GetMapping("/confirm-user-payment")
+    public HashMap<String, Object> confirmPayments(@RequestParam("resp") String response, @r) {
+     return paymentsService.confirmUserPayments(response);
+    }
+
+    @GetMapping("/response")
+    public HashMap<String, Object> confirmPayments(@RequestParam("resp") String response) {
+        return paymentsService.confirmPayments(response);
+    }
+
 
     @GetMapping("/user-payments")
     public List<Payments> userPayments(@RequestHeader("Authorization") String accessToken) {
