@@ -13,6 +13,4 @@ public interface PaymentsRepository extends JpaRepository<Payments, Long> {
     @Query("SELECT s FROM Payments s WHERE s.payerId = ?1 AND s.payerType = ?2")
     Optional<List<Payments>> findPaymentsByPayerId(Long payerId, String payerType);
 
-    @Query("SELECT s FROM Payments s WHERE s.paymentRef = ?1")
-    Optional<Payments> findPaymentByPaymentRef(String paymentRef);
 }

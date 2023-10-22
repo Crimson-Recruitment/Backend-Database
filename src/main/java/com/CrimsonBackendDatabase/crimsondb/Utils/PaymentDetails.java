@@ -20,7 +20,6 @@ public class PaymentDetails {
     private String mobilePaymentType;
     private String expiryYear;
     private String phoneNumber = "";
-    private String email = "";
 
     public PaymentDetails() {
     }
@@ -34,7 +33,6 @@ public class PaymentDetails {
         this.transactionName = transactionName;
         this.paymentType = paymentType;
         this.phoneNumber = phoneNumber;
-        this.email = email;
     }
 
     public PaymentDetails(String transactionName, String expiryYear, String paymentType, String amount, String cardNo, String cvv, String expiryMonth, String currency, String country, String firstName, String pin, String billingAddress, String billingCity, String billingCountry) {

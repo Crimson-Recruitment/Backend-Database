@@ -19,7 +19,6 @@ public class Payments {
     private String payerType;
     private Long payerId;
     private String transactionName;
-    private String paymentRef;
     private String status;
     private String paymentType;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -28,13 +27,12 @@ public class Payments {
     public Payments() {
     }
 
-    public Payments(String amount, String payerType, Long payerId, String transactionName, String paymentType, String paymentRef, String status) {
+    public Payments(String amount, String payerType, Long payerId, String transactionName, String paymentType, String status) {
         this.amount = amount;
         this.payerType = payerType;
         this.payerId = payerId;
         this.transactionName = transactionName;
         this.paymentType = paymentType;
-        this.paymentRef = paymentRef;
         this.status = status;
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 1);

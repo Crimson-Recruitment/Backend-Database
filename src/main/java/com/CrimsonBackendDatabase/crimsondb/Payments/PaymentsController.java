@@ -4,12 +4,14 @@ import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidP
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidTierTypeException;
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.PaymentNotFoundException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
+import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PaymentDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -41,19 +43,19 @@ public class PaymentsController {
     }
 
     @GetMapping("/confirm-user-payment")
-    public HashMap<String, Object> confirmUserPayments(@RequestParam("resp") String response, @RequestParam("accessCode") String accessToken) {
+    public Map<String, Object> confirmUserPayments(@RequestParam("resp") String response) {
         try {
-            return paymentsService.confirmUserPayments(response, accessToken);
-        } catch (PaymentNotFoundException | InvalidTokenException e) {
+            return paymentsService.confirmUserPayments(response);
+        } catch (PaymentNotFoundException | InvalidTokenException | InvalidUserException e) {
             throw new RuntimeException(e);
         }
     }
 
     @GetMapping("/confirm-company-payment")
-    public HashMap<String, Object> confirmCompanyPayments(@RequestParam("resp") String response, @RequestParam("accessCode") String accessToken) {
+    public Map<String, Object> confirmCompanyPayments(@RequestParam("resp") String response) {
         try {
-            return paymentsService.confirmCompanyPayments(response, accessToken);
-        } catch (PaymentNotFoundException | InvalidTokenException e) {
+            return paymentsService.confirmCompanyPayments(response);
+        } catch (PaymentNotFoundException | InvalidTokenException | InvalidUserException e) {
             throw new RuntimeException(e);
         }
     }
