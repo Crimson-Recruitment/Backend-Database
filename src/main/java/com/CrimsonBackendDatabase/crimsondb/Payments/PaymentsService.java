@@ -51,6 +51,7 @@ public class PaymentsService {
         this.usersRepository = usersRepository;
         this.companyRepository = companyRepository;
     }
+    @Transactional
     public HashMap<String, Object> userSubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException, InvalidTierTypeException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
@@ -59,6 +60,7 @@ public class PaymentsService {
                 String userEmail = "";
                 String userPhoneNumber = "";
                 String amount = "";
+                userToken.get().getUsers().setPaymentRandom(RandomStringUtils.randomAlphanumeric(8));
                 if (paymentDetails.getTransactionName().equals("Premium")) {
                     amount = "1000";
                 } else {
@@ -137,6 +139,7 @@ public class PaymentsService {
             throw new InvalidTokenException();
         }
     };
+    @Transactional
     public HashMap<String, Object> companySubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException, InvalidTierTypeException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
@@ -145,6 +148,7 @@ public class PaymentsService {
                 String companyEmail = "";
                 String companyPhoneNumber = "";
                 String amount = "";
+                companyToken.get().getCompany().setPaymentRandom(RandomStringUtils.randomAlphanumeric(8));
                 switch (paymentDetails.getTransactionName()){
                     case "Starter":
                         amount = "3000";
@@ -249,21 +253,22 @@ public class PaymentsService {
     @Transactional
     public HashMap<String, Object> confirmUserPayments(String response) throws PaymentNotFoundException, InvalidTokenException, InvalidUserException {
             HashMap<String, Object> data  = new Gson().fromJson(response, new TypeToken<HashMap<String, Object>>(){}.getType());
-            if (data.get("status") == "success") {
-                HashMap<String, Object> respData = (HashMap<String, Object>) data.get("data");
+            if (Objects.equals(data.get("status").toString(), "success")) {
+                Map<String, Object> respData = (Map<String, Object>) data.get("data");
                 Optional<Users> user = usersRepository.findUsersByEmail((String) respData.get("customer.email"));
                 if(user.isPresent()) {
                     Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(user.get().getId(), "User",user.get().getPaymentRandom());
                     if (payment.isPresent()){
                         payment.get().setStatus(data.get("status").toString());
-                        usersService.updatePaymentRandom(user.get());
+                        String random = RandomStringUtils.randomAlphanumeric(8);
+                        usersRepository.setUserInfoById(random, user.get().getId());
+                        return data;
                     } else {
                         throw new PaymentNotFoundException("This payment doesn't exist!");
                     }
                 } else {
                     throw new InvalidUserException();
                 }
-                return data;
             } else {
                 return data;
             }
@@ -272,14 +277,15 @@ public class PaymentsService {
     @Transactional
     public HashMap<String, Object> confirmCompanyPayments(String response) throws PaymentNotFoundException, InvalidTokenException, InvalidUserException {
             HashMap<String, Object> data  = new Gson().fromJson(response, new TypeToken<HashMap<String, Object>>(){}.getType());
-        if (data.get("status") == "success") {
-            HashMap<String, Object> respData = (HashMap<String, Object>) data.get("data");
+        if (Objects.equals(data.get("status").toString(), "success")) {
+            Map<String, Object> respData = (Map<String, Object>) data.get("data");
             Optional<Company> company = companyRepository.findCompanyByEmail((String) respData.get("customer.email"));
             if(company.isPresent()) {
-                Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(company.get().getId(), "User",company.get().getPaymentRandom());
+                Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(company.get().getId(), "Company",company.get().getPaymentRandom());
                 if (payment.isPresent()){
                     payment.get().setStatus(data.get("status").toString());
-                    company.get().changePaymentRandom();
+                    String random = RandomStringUtils.randomAlphanumeric(8);
+                    companyRepository.setCompanyInfoById(random, company.get().getId());
                 } else {
                     throw new PaymentNotFoundException("This payment doesn't exist!");
                 }

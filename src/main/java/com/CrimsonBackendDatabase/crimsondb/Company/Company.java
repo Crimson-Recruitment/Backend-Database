@@ -6,6 +6,8 @@ import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -33,7 +35,7 @@ public class Company{
     private String zoomAccessToken;
     @Column(length = 2048)
     private String zoomRefreshToken;
-    private String paymentRandom;
+    private String paymentRandom = RandomStringUtils.randomAlphanumeric(8);
 
     private List<String> companyImages;
 
@@ -50,6 +52,7 @@ public class Company{
     private Collection<CompanyMessages> companyMessages;
 
     public Company() {
+        paymentRandom = RandomStringUtils.randomAlphanumeric(8);
     }
 
     public Company(String companyName, String email, String overview, String profileImage,List<String> companyImages,String primaryPhoneNumber, String secondaryPhoneNumber, String category, String tier, String password) {
@@ -65,11 +68,11 @@ public class Company{
         this.overview = overview;
         this.tier = tier;
         this.password = password;
-        this.paymentRandom = generatePaymentRandom();
+        paymentRandom = RandomStringUtils.randomAlphanumeric(8);
     }
 
-    public void changePaymentRandom() {
-        paymentRandom = generatePaymentRandom();
+    public void setPaymentRandom(String paymentRandom) {
+        paymentRandom = paymentRandom;
     }
 
     public void setZoomRefreshToken(String zoomRefreshToken) {
@@ -132,39 +135,4 @@ public class Company{
         this.tier = tier;
     }
 
-    private String generatePaymentRandom() {
-
-        // create a string of uppercase and lowercase characters and numbers
-        String upperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lowerAlphabet = "abcdefghijklmnopqrstuvwxyz";
-        String numbers = "0123456789";
-
-        // combine all strings
-        String alphaNumeric = upperAlphabet + lowerAlphabet + numbers;
-
-        // create random string builder
-        StringBuilder sb = new StringBuilder();
-
-        // create an object of Random class
-        Random random = new Random();
-
-        // specify length of random string
-        int length = 8;
-
-        for(int i = 0; i < length; i++) {
-
-            // generate random index number
-            int index = random.nextInt(alphaNumeric.length());
-
-            // get character specified by index
-            // from the string
-            char randomChar = alphaNumeric.charAt(index);
-
-            // append the character to string builder
-            sb.append(randomChar);
-        }
-
-        return sb.toString();
-
-    }
 }
