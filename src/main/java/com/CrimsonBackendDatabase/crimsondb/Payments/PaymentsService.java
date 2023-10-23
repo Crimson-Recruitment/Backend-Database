@@ -34,9 +34,6 @@ public class PaymentsService {
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-
-
-
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;
@@ -102,6 +99,7 @@ public class PaymentsService {
             String email,
             String phoneNumber,
             String firstName,
+            String lastName,
             String pin,
             String billingAddress,
             String billingCity,
@@ -114,6 +112,7 @@ public class PaymentsService {
         cardload.setCvv(cvv);
         cardload.setExpirymonth(expiryMonth);
         cardload.setCurrency(currency);
+        cardload.setLastname(lastName);
         cardload.setCountry(country);
         cardload.setAmount(amount);
         cardload.setEmail(email);
@@ -172,6 +171,7 @@ public class PaymentsService {
             String phoneNumber,
             String email,
             String firstName,
+            String lastName,
             String narration,
             String country,
             String paymentType
@@ -182,6 +182,7 @@ public class PaymentsService {
         mobilemoneyPayload.setPBFPubKey(flPublicKey);
         mobilemoneyPayload.setCurrency(currency);
         mobilemoneyPayload.setAmount(amount);
+        mobilemoneyPayload.setLastname(lastName);
         mobilemoneyPayload.setPhonenumber(phoneNumber);
         mobilemoneyPayload.setEmail(email);
         mobilemoneyPayload.setFirstname(firstName);

@@ -7,6 +7,7 @@ import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,6 +47,8 @@ public class Users implements Cloneable {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UserMessages> userMessages;
+    @JsonIgnore
+    private String random = RandomStringUtils.random(8);
 
     public Users() {
     }
@@ -65,6 +68,14 @@ public class Users implements Cloneable {
         this.tier = tier;
     }
 
+
+    public String getRandom() {
+        return random;
+    }
+
+    public void changeRandom(){
+        random = RandomStringUtils.random(8);
+    }
     public Long getId() {
         return id;
     }
