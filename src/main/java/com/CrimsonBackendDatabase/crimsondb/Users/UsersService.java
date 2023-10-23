@@ -8,6 +8,7 @@ import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsExcepti
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
 import com.CrimsonBackendDatabase.crimsondb.Utils.UserDetails;
+import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -122,6 +123,11 @@ public class UsersService {
         }
 
     };
+
+    @Transactional
+    public void updatePaymentRandom(Users user) {
+        user.setPaymentRandom(RandomStringUtils.randomAlphanumeric(8));
+    }
 
     public HashMap<String, String> getAccessToken(String email) throws InvalidUserException {
         Optional<Users> user = usersRepository.findUsersByEmail(email);

@@ -3,18 +3,17 @@ package com.CrimsonBackendDatabase.crimsondb.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
-import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
-
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 @Entity
 @Table
-public class Company implements Cloneable{
+public class Company{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +33,7 @@ public class Company implements Cloneable{
     private String zoomAccessToken;
     @Column(length = 2048)
     private String zoomRefreshToken;
+    private String paymentRandom;
 
     private List<String> companyImages;
 
@@ -65,8 +65,12 @@ public class Company implements Cloneable{
         this.overview = overview;
         this.tier = tier;
         this.password = password;
+        this.paymentRandom = generatePaymentRandom();
     }
 
+    public void changePaymentRandom() {
+        paymentRandom = generatePaymentRandom();
+    }
 
     public void setZoomRefreshToken(String zoomRefreshToken) {
         this.zoomRefreshToken = zoomRefreshToken;
@@ -128,13 +132,39 @@ public class Company implements Cloneable{
         this.tier = tier;
     }
 
-    @Override
-    public Company clone() {
-        try {
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return (Company) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+    private String generatePaymentRandom() {
+
+        // create a string of uppercase and lowercase characters and numbers
+        String upperAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerAlphabet = "abcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+
+        // combine all strings
+        String alphaNumeric = upperAlphabet + lowerAlphabet + numbers;
+
+        // create random string builder
+        StringBuilder sb = new StringBuilder();
+
+        // create an object of Random class
+        Random random = new Random();
+
+        // specify length of random string
+        int length = 8;
+
+        for(int i = 0; i < length; i++) {
+
+            // generate random index number
+            int index = random.nextInt(alphaNumeric.length());
+
+            // get character specified by index
+            // from the string
+            char randomChar = alphaNumeric.charAt(index);
+
+            // append the character to string builder
+            sb.append(randomChar);
         }
+
+        return sb.toString();
+
     }
 }

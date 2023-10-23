@@ -11,10 +11,11 @@ import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 @Entity
 @Table
-public class Users implements Cloneable {
+public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +37,7 @@ public class Users implements Cloneable {
     private String bio;
     private List<String> skills;
     private String tier;
+    private String paymentRandom;
 
     @JsonIgnore
     @OneToOne(mappedBy = "users", cascade = CascadeType.ALL)
@@ -47,10 +49,9 @@ public class Users implements Cloneable {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<UserMessages> userMessages;
-    @JsonIgnore
-    private String random = RandomStringUtils.random(8);
 
     public Users() {
+        paymentRandom = RandomStringUtils.randomAlphanumeric(8);
     }
 
     public Users(String firstName, String lastName, String phoneNumber, String email, String profileImage, String cv, String jobTitle, String bio, List<String> skills, String tier) {
@@ -66,16 +67,18 @@ public class Users implements Cloneable {
         this.jobTitle = jobTitle;
         this.bio = bio;
         this.tier = tier;
+        paymentRandom = RandomStringUtils.randomAlphanumeric(8);
     }
 
 
-    public String getRandom() {
-        return random;
+    public String getPaymentRandom() {
+        return paymentRandom;
     }
 
-    public void changeRandom(){
-        random = RandomStringUtils.random(8);
+    public void setPaymentRandom(String paymentRandom) {
+        this.paymentRandom = paymentRandom;
     }
+
     public Long getId() {
         return id;
     }
@@ -194,14 +197,4 @@ public class Users implements Cloneable {
         this.tier = tier;
     }
 
-    @Override
-    public Users clone() {
-        try {
-            Users clone = (Users) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
 }

@@ -12,10 +12,12 @@ import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersRepository;
+import com.CrimsonBackendDatabase.crimsondb.Users.UsersService;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PaymentDetails;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import jakarta.transaction.Transactional;
+import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,10 +41,12 @@ public class PaymentsService {
     private final PaymentsRepository paymentsRepository;
     private final UsersRepository usersRepository;
     private final CompanyRepository companyRepository;
+    private final UsersService usersService;
 
-    public PaymentsService(UserTokenService userTokenService, CompanyTokenService companyTokenService, PaymentsRepository paymentsRepository, UsersRepository usersRepository, CompanyRepository companyRepository){
+    public PaymentsService(UserTokenService userTokenService, CompanyTokenService companyTokenService, PaymentsRepository paymentsRepository, UsersRepository usersRepository, CompanyRepository companyRepository, UsersService userService){
         this.companyTokenService =  companyTokenService;
         this.userTokenService = userTokenService;
+        this.usersService = userService;
         this.paymentsRepository = paymentsRepository;
         this.usersRepository = usersRepository;
         this.companyRepository = companyRepository;
@@ -56,7 +60,7 @@ public class PaymentsService {
                 String userPhoneNumber = "";
                 String amount = "";
                 if (paymentDetails.getTransactionName().equals("Premium")) {
-                    amount = "6000";
+                    amount = "1000";
                 } else {
                     throw new InvalidTierTypeException("This tier doesn't exist!");
                 }
@@ -78,6 +82,7 @@ public class PaymentsService {
                             userEmail,
                             userPhoneNumber,
                             paymentDetails.getFirstName(),
+                            userToken.get().getUsers().getPaymentRandom(),
                             paymentDetails.getPin(),
                             paymentDetails.getBillingAddress(),
                             paymentDetails.getBillingCity(),
@@ -85,17 +90,16 @@ public class PaymentsService {
                             "http://localhost:8081/payments/confirm-user-payment"
                     );
                     HashMap<String, Object> data = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
-                    HashMap<String, Object> responseData = (HashMap<String, Object>) data.get("data");
                     Payments payment = new Payments(
                             amount,
                             "User",
                             userToken.get().getUsers().getId(),
                             paymentDetails.getTransactionName(),
                             paymentDetails.getPaymentType(),
-                            (String) data.get("status"));
-                    data.put("result", "success");
+                            (String) data.get("status"),
+                            userToken.get().getUsers().getPaymentRandom()
+                    );
                     paymentsRepository.save(payment);
-                    data.put("result", "success");
                     return data;
                 }else if(paymentDetails.getPaymentType().equalsIgnoreCase("mobilemoney")) {
                     String result = mobileMoneyPayment(
@@ -104,12 +108,24 @@ public class PaymentsService {
                             userPhoneNumber,
                             userEmail,
                             paymentDetails.getFirstName(),
+                            userToken.get().getUsers().getPaymentRandom(),
                             paymentDetails.getNarration(),
                             paymentDetails.getCountry(),
                             paymentDetails.getMobilePaymentType(),
                             "http://localhost:8081/payments/confirm-user-payment"
                     );
-                    return new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
+                    HashMap<String, Object> data = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
+                    Payments payment = new Payments(
+                            amount,
+                            "User",
+                            userToken.get().getUsers().getId(),
+                            paymentDetails.getTransactionName(),
+                            paymentDetails.getPaymentType(),
+                            data.get("status").toString(),
+                            userToken.get().getUsers().getPaymentRandom()
+                    );
+                    paymentsRepository.save(payment);
+                    return data;
                 } else {
                     throw new InvalidPaymentTypeException();
                 }
@@ -126,8 +142,8 @@ public class PaymentsService {
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
-                String userEmail = "";
-                String userPhoneNumber = "";
+                String companyEmail = "";
+                String companyPhoneNumber = "";
                 String amount = "";
                 switch (paymentDetails.getTransactionName()){
                     case "Starter":
@@ -142,11 +158,11 @@ public class PaymentsService {
                     default:
                         throw new InvalidTierTypeException("This tier doesn't exist!");
                 }
-                userEmail = companyToken.get().getCompany().getEmail();
+                companyEmail = companyToken.get().getCompany().getEmail();
                 if (Objects.equals(paymentDetails.getPhoneNumber(), "") ||Objects.equals(paymentDetails.getPhoneNumber(), null)) {
-                    userPhoneNumber = companyToken.get().getCompany().getPrimaryPhoneNumber();
+                    companyPhoneNumber = companyToken.get().getCompany().getPrimaryPhoneNumber();
                 } else {
-                    userPhoneNumber = paymentDetails.getPhoneNumber();
+                    companyPhoneNumber = paymentDetails.getPhoneNumber();
                 }
                 if(paymentDetails.getPaymentType().equalsIgnoreCase("card")) {
                     String result = cardPayment(
@@ -157,9 +173,10 @@ public class PaymentsService {
                             paymentDetails.getCurrency(),
                             paymentDetails.getCountry(),
                             amount,
-                            userEmail,
-                            userPhoneNumber,
+                            companyEmail,
+                            companyPhoneNumber,
                             paymentDetails.getFirstName(),
+                            companyToken.get().getCompany().getPaymentRandom(),
                             paymentDetails.getPin(),
                             paymentDetails.getBillingAddress(),
                             paymentDetails.getBillingCity(),
@@ -167,14 +184,25 @@ public class PaymentsService {
                             "http://localhost:8081/payments/confirm-company-payment"
                     );
                     HashMap<String, Object> data = new Gson().fromJson(result, new TypeToken<HashMap<String, Object>>(){}.getType());
+                    Payments payment = new Payments(
+                            amount,
+                            "Company",
+                            companyToken.get().getCompany().getId(),
+                            paymentDetails.getTransactionName(),
+                            paymentDetails.getPaymentType(),
+                            data.get("status").toString(),
+                            companyToken.get().getCompany().getPaymentRandom()
+                    );
+                    paymentsRepository.save(payment);
                     return data;
                 }else if(paymentDetails.getPaymentType().equalsIgnoreCase("mobilemoney")) {
                     String result = mobileMoneyPayment(
                             paymentDetails.getCurrency(),
                             amount,
-                            userPhoneNumber,
-                            userEmail,
+                            companyPhoneNumber,
+                            companyEmail,
                             paymentDetails.getFirstName(),
+                            companyToken.get().getCompany().getPaymentRandom(),
                             paymentDetails.getNarration(),
                             paymentDetails.getCountry(),
                             paymentDetails.getMobilePaymentType(),
@@ -188,8 +216,11 @@ public class PaymentsService {
                             companyToken.get().getCompany().getId(),
                             paymentDetails.getTransactionName(),
                             paymentDetails.getPaymentType(),
-                            data.get("status").toString());
+                            data.get("status").toString(),
+                            companyToken.get().getCompany().getPaymentRandom()
+                    );
                     paymentsRepository.save(payment);
+                    return data;
                 }else {
                     throw new InvalidPaymentTypeException();
                 }
@@ -219,41 +250,43 @@ public class PaymentsService {
     public HashMap<String, Object> confirmUserPayments(String response) throws PaymentNotFoundException, InvalidTokenException, InvalidUserException {
             HashMap<String, Object> data  = new Gson().fromJson(response, new TypeToken<HashMap<String, Object>>(){}.getType());
             if (data.get("status") == "success") {
-                HashMap<String, Object> mo = (HashMap<String, Object>) data.get("data");
-                Optional<Users> user = usersRepository.findUsersByEmail((String) mo.get("customer.email"));
+                HashMap<String, Object> respData = (HashMap<String, Object>) data.get("data");
+                Optional<Users> user = usersRepository.findUsersByEmail((String) respData.get("customer.email"));
                 if(user.isPresent()) {
-                    Optional<Payments> payment = paymentsRepository.findPaymentsByPayerId(user.get().getId(), "User");
+                    Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(user.get().getId(), "User",user.get().getPaymentRandom());
                     if (payment.isPresent()){
                         payment.get().setStatus(data.get("status").toString());
+                        usersService.updatePaymentRandom(user.get());
                     } else {
                         throw new PaymentNotFoundException("This payment doesn't exist!");
                     }
                 } else {
                     throw new InvalidUserException();
                 }
-                return mo;
+                return data;
             } else {
                 return data;
             }
 
     };
+    @Transactional
     public HashMap<String, Object> confirmCompanyPayments(String response) throws PaymentNotFoundException, InvalidTokenException, InvalidUserException {
             HashMap<String, Object> data  = new Gson().fromJson(response, new TypeToken<HashMap<String, Object>>(){}.getType());
         if (data.get("status") == "success") {
-            HashMap<String, Object> mo = (HashMap<String, Object>) data.get("data");
-            Optional<Company> company = companyRepository.findCompanyByEmail((String) mo.get("customer.email"));
+            HashMap<String, Object> respData = (HashMap<String, Object>) data.get("data");
+            Optional<Company> company = companyRepository.findCompanyByEmail((String) respData.get("customer.email"));
             if(company.isPresent()) {
-                Payments payment = new Payments(
-                        mo.get("amount").toString(),
-                        "Company",
-                        company.get().getId(),
-                        "Premium",
-                        mo.get("paymentType").toString(),
-                        data.get("status").toString());
+                Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(company.get().getId(), "User",company.get().getPaymentRandom());
+                if (payment.isPresent()){
+                    payment.get().setStatus(data.get("status").toString());
+                    company.get().changePaymentRandom();
+                } else {
+                    throw new PaymentNotFoundException("This payment doesn't exist!");
+                }
             } else {
                 throw new InvalidUserException();
             }
-            return mo;
+            return data;
         } else {
             return data;
         }
@@ -265,8 +298,8 @@ public class PaymentsService {
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
-                String userEmail = "";
-                String userPhoneNumber = "";
+                String companyEmail = "";
+                String companyPhoneNumber = "";
                 String amount = "";
                 switch (companyToken.get().getCompany().getTier()){
                     case "Free":
@@ -284,11 +317,11 @@ public class PaymentsService {
                     default:
                         throw new InvalidTierTypeException("This tier doesn't exist!");
                 }
-                userEmail = companyToken.get().getCompany().getEmail();
+                companyEmail = companyToken.get().getCompany().getEmail();
                 if (Objects.equals(paymentDetails.getPhoneNumber(), "") ||Objects.equals(paymentDetails.getPhoneNumber(), null)) {
-                    userPhoneNumber = companyToken.get().getCompany().getPrimaryPhoneNumber();
+                    companyPhoneNumber = companyToken.get().getCompany().getPrimaryPhoneNumber();
                 } else {
-                    userPhoneNumber = paymentDetails.getPhoneNumber();
+                    companyPhoneNumber = paymentDetails.getPhoneNumber();
                 }
                 if(paymentDetails.getPaymentType().equalsIgnoreCase("card")) {
                     String result = cardPayment(
@@ -299,9 +332,10 @@ public class PaymentsService {
                             paymentDetails.getCurrency(),
                             paymentDetails.getCountry(),
                             amount,
-                            userEmail,
-                            userPhoneNumber,
+                            companyEmail,
+                            companyPhoneNumber,
                             paymentDetails.getFirstName(),
+                            companyToken.get().getCompany().getPaymentRandom(),
                             paymentDetails.getPin(),
                             paymentDetails.getBillingAddress(),
                             paymentDetails.getBillingCity(),
@@ -315,9 +349,10 @@ public class PaymentsService {
                     String result = mobileMoneyPayment(
                             paymentDetails.getCurrency(),
                             amount,
-                            userPhoneNumber,
-                            userEmail,
+                            companyPhoneNumber,
+                            companyEmail,
                             paymentDetails.getFirstName(),
+                            companyToken.get().getCompany().getPaymentRandom(),
                             paymentDetails.getNarration(),
                             paymentDetails.getCountry(),
                             paymentDetails.getMobilePaymentType(),
@@ -362,6 +397,7 @@ public class PaymentsService {
             String email,
             String phoneNumber,
             String firstName,
+            String lastName,
             String pin,
             String billingAddress,
             String billingCity,
@@ -384,6 +420,7 @@ public class PaymentsService {
         cardload.setEncryption_key(flEncryptionKey);
         cardload.setPhonenumber(phoneNumber);
         cardload.setFirstname(firstName);
+        cardload.setLastname(lastName);
 
         String response = cardPayment.doflwcardpayment(cardload);
 
@@ -437,6 +474,7 @@ public class PaymentsService {
             String phoneNumber,
             String email,
             String firstName,
+            String lastName,
             String narration,
             String country,
             String paymentType,
@@ -452,6 +490,7 @@ public class PaymentsService {
         mobilemoneyPayload.setEmail(email);
         mobilemoneyPayload.setRedirect_url(redirect_url);
         mobilemoneyPayload.setFirstname(firstName);
+        mobilemoneyPayload.setLastname(lastName);
         mobilemoneyPayload.setNetwork(narration);
         mobilemoneyPayload.setEncryption_key(flEncryptionKey);
         mobilemoneyPayload.setSecret_key(flSecretKey);
