@@ -1,4 +1,4 @@
-package com.CrimsonBackendDatabase.crimsondb;
+package com.CrimsonBackendDatabase.crimsondb.Config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -17,7 +17,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/all","/specific");
+        registry.enableSimpleBroker("/all","/msg");
         registry.setApplicationDestinationPrefixes("/crimsonws");
 
     }

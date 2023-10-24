@@ -10,6 +10,7 @@ import com.CrimsonBackendDatabase.crimsondb.UserMessages.UserMessagesRepository;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersRepository;
+import com.CrimsonBackendDatabase.crimsondb.Utils.ChatMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class CompanyMessagesService {
         this.userMessagesRepository = userMessagesRepository;
         this.companyMessagesRepository = companyMessagesRepository;
     }
-    public HashMap<String, String> postCompanyMessage(String accessToken, String message, Long receiverId, String receiverType) throws InvalidTokenException, InvalidReceiverException {
+    public ChatMessage postCompanyMessage(String accessToken, ChatMessage message, Long receiverId, String receiverType) throws InvalidTokenException, InvalidReceiverException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
@@ -70,7 +71,7 @@ public class CompanyMessagesService {
                 }
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
-                return data;
+                return message;
             } else {
                 throw new InvalidTokenException();
             }
