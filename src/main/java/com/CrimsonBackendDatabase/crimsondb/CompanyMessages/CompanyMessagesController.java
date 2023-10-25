@@ -19,7 +19,7 @@ public class CompanyMessagesController {
     }
 
     @MessageMapping("/crimsonws/send-message/{receiverType}/{receiverId}")
-    @SendTo("/msg/receive-message/{receiverId}")
+    @SendTo("/msg/receive-message/{receiverType}/{receiverId}")
     public ChatMessage sendMessage(
             @Payload ChatMessage message,
             SimpMessageHeaderAccessor headerAccessor,

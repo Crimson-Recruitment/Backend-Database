@@ -27,7 +27,7 @@ public class WebSocketEventListener {
                     .id(-1)
                     .message("Bye bye")
                     .build();
-            messagingTemplate.convertAndSend("/topic/public", chatMessage);
+            messagingTemplate.convertAndSend("/all", chatMessage);
         }
     }
 }
