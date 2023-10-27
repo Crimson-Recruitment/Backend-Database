@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Company;
 
-import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
+import com.CrimsonBackendDatabase.crimsondb.CompanyChatMessages.CompanyChatMessages;
+import com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager.CompanyMessageManager;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,7 +11,6 @@ import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 @Getter
 @Entity
@@ -47,9 +47,6 @@ public class Company{
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<Jobs> jobs;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
-    private Collection<CompanyMessages> companyMessages;
 
     public Company() {
         paymentRandom = RandomStringUtils.randomAlphanumeric(8);
@@ -97,10 +94,6 @@ public class Company{
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
-    }
-
-    public void setCompanyMessages(Collection<CompanyMessages> companyMessages) {
-        this.companyMessages = companyMessages;
     }
 
     public void setEmail(String email) {

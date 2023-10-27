@@ -1,10 +1,10 @@
-package com.CrimsonBackendDatabase.crimsondb.UserMessages;
+package com.CrimsonBackendDatabase.crimsondb.UserMessageManager;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyRepository;
-import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessages;
-import com.CrimsonBackendDatabase.crimsondb.CompanyMessages.CompanyMessagesRepository;
-import com.CrimsonBackendDatabase.crimsondb.UserMessages.UserMessagesException.InvalidReceiverException;
+import com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager.CompanyMessageManager;
+import com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager.CompanyMessageManagerRepository;
+import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessagesException.InvalidReceiverException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
@@ -18,19 +18,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class UserMessagesService {
+public class UserMessageManagerService {
     private final UserTokenService userTokenService;
     private final UsersRepository usersRepository;
     private final CompanyRepository companyRepository;
-    private final UserMessagesRepository userMessagesRepository;
-    private final CompanyMessagesRepository companyMessagesRepository;
+    private final UserMessageManagerRepository userMessageManagerRepository;
+    private final CompanyMessageManagerRepository companyMessagesRepository;
 
     @Autowired
-    public UserMessagesService(UserTokenService userTokenService, UsersRepository usersRepository, CompanyRepository companyRepository,UserMessagesRepository userMessagesRepository, CompanyMessagesRepository companyMessagesRepository) {
+    public UserMessageManagerService(UserTokenService userTokenService, UsersRepository usersRepository, CompanyRepository companyRepository, UserMessageManagerRepository userMessageManagerRepository, CompanyMessageManagerRepository companyMessagesRepository) {
         this.userTokenService = userTokenService;
         this.usersRepository = usersRepository;
         this.companyRepository = companyRepository;
-        this.userMessagesRepository = userMessagesRepository;
+        this.userMessageManagerRepository = userMessageManagerRepository;
         this.companyMessagesRepository = companyMessagesRepository;
     }
     public HashMap<String, String> postUserMessage(String accessToken, String message, Long receiverId, String receiverType) throws InvalidTokenException, InvalidReceiverException {
@@ -38,14 +38,14 @@ public class UserMessagesService {
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-                Optional<UserMessages> userPrimary = userMessagesRepository.findUserMessagesByUser(userToken.get().getUsers(), receiverId);
+                Optional<UserMessageManager> userPrimary = userMessageManagerRepository.findUserMessageManagerByUser(userToken.get().getUsers(), receiverId);
                 if(userPrimary.isPresent()) {
 
                 } else {
                     if(Objects.equals(receiverType, "User")) {
                         Optional<Users> userReceiver = usersRepository.findById(receiverId);
                         if(userReceiver.isPresent()) {
-                            Optional<UserMessages> userSecondary = userMessagesRepository.findUserMessagesByUser(userReceiver.get(), userToken.get().getUsers().getId());
+                            Optional<UserMessageManager> userSecondary = userMessageManagerRepository.findUserMessageManagerByUser(userReceiver.get(), userToken.get().getUsers().getId());
                             if(userSecondary.isPresent()) {
 
                             } else {
@@ -57,7 +57,7 @@ public class UserMessagesService {
                     } else if (Objects.equals(receiverType, "Company")) {
                         Optional<Company> companyReceiver = companyRepository.findById(receiverId);
                         if(companyReceiver.isPresent()) {
-                            Optional<CompanyMessages> userSecondary = companyMessagesRepository.findCompanyMessagesByCompany(companyReceiver.get(), receiverId);
+                            Optional<CompanyMessageManager> userSecondary = companyMessagesRepository.findCompanyMessageManagerByCompany(companyReceiver.get(), receiverId);
                             if(userSecondary.isPresent()) {
 
                             } else {
@@ -83,14 +83,14 @@ public class UserMessagesService {
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-                Optional<UserMessages> userPrimary = userMessagesRepository.findUserMessagesByUser(userToken.get().getUsers(), receiverId);
+                Optional<UserMessageManager> userPrimary = userMessageManagerRepository.findUserMessageManagerByUser(userToken.get().getUsers(), receiverId);
                 if(userPrimary.isPresent()) {
 
                 } else {
                     if(Objects.equals(receiverType, "User")) {
                         Optional<Users> userReceiver = usersRepository.findById(receiverId);
                         if(userReceiver.isPresent()) {
-                            Optional<UserMessages> userSecondary = userMessagesRepository.findUserMessagesByUser(userReceiver.get(), userToken.get().getUsers().getId());
+                            Optional<UserMessageManager> userSecondary = userMessageManagerRepository.findUserMessageManagerByUser(userReceiver.get(), userToken.get().getUsers().getId());
                             if(userSecondary.isPresent()) {
 
                             } else {
@@ -102,7 +102,7 @@ public class UserMessagesService {
                     } else if (Objects.equals(receiverType, "Company")) {
                         Optional<Company> companyReceiver = companyRepository.findById(receiverId);
                         if(companyReceiver.isPresent()) {
-                            Optional<CompanyMessages> userSecondary = companyMessagesRepository.findCompanyMessagesByCompany(companyReceiver.get(), receiverId);
+                            Optional<CompanyMessageManager> userSecondary = companyMessagesRepository.findCompanyMessageManagerByCompany(companyReceiver.get(), receiverId);
                             if(userSecondary.isPresent()) {
 
                             } else {
@@ -129,14 +129,14 @@ public class UserMessagesService {
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-                Optional<UserMessages> userPrimary = userMessagesRepository.findUserMessagesByUser(userToken.get().getUsers(), receiverId);
+                Optional<UserMessageManager> userPrimary = userMessageManagerRepository.findUserMessageManagerByUser(userToken.get().getUsers(), receiverId);
                 if(userPrimary.isPresent()) {
 
                 } else {
                     if(Objects.equals(receiverType, "User")) {
                         Optional<Users> userReceiver = usersRepository.findById(receiverId);
                         if(userReceiver.isPresent()) {
-                            Optional<UserMessages> userSecondary = userMessagesRepository.findUserMessagesByUser(userReceiver.get(), userToken.get().getUsers().getId());
+                            Optional<UserMessageManager> userSecondary = userMessageManagerRepository.findUserMessageManagerByUser(userReceiver.get(), userToken.get().getUsers().getId());
                             if(userSecondary.isPresent()) {
 
                             } else {
@@ -148,7 +148,7 @@ public class UserMessagesService {
                     } else if (Objects.equals(receiverType, "Company")) {
                         Optional<Company> companyReceiver = companyRepository.findById(receiverId);
                         if(companyReceiver.isPresent()) {
-                            Optional<CompanyMessages> userSecondary = companyMessagesRepository.findCompanyMessagesByCompany(companyReceiver.get(), receiverId);
+                            Optional<CompanyMessageManager> userSecondary = companyMessagesRepository.findCompanyMessageManagerByCompany(companyReceiver.get(), receiverId);
                             if(userSecondary.isPresent()) {
 
                             } else {

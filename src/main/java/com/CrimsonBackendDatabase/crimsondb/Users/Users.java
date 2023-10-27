@@ -1,8 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Users;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
-import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
-import com.CrimsonBackendDatabase.crimsondb.UserMessages.UserMessages;
+import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessageManager;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,10 +10,10 @@ import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
 
 @Entity
 @Table
+@Getter
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,9 +45,6 @@ public class Users {
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
-    @JsonIgnore
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Collection<UserMessages> userMessages;
 
     public Users() {
         paymentRandom = RandomStringUtils.randomAlphanumeric(8);
@@ -145,10 +141,6 @@ public class Users {
 
     public Collection<Applications> getApplications() {
         return applications;
-    }
-
-    public Collection<UserMessages> getUserMessages() {
-        return userMessages;
     }
 
     public void setLocation(String location) {

@@ -1,16 +1,12 @@
-package com.CrimsonBackendDatabase.crimsondb.CompanyMessages;
+package com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager;
 
-import com.CrimsonBackendDatabase.crimsondb.UserMessages.UserMessagesException.InvalidReceiverException;
+import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessagesException.InvalidReceiverException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.ChatMessage;
 import org.apache.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.*;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
@@ -19,20 +15,20 @@ import java.util.Map;
 
 
 @Controller
-public class CompanyMessagesController {
+public class CompanyMessageManagerController {
 
-    private final CompanyMessagesService companyMessagesService;
+    private final CompanyMessageManagerService companyMessagesService;
     private final SimpMessageSendingOperations messagingTemplate;
 
     @Autowired
-    public CompanyMessagesController(CompanyMessagesService companyMessagesService, SimpMessageSendingOperations messagingTemplate) {
+    public CompanyMessageManagerController(CompanyMessageManagerService companyMessagesService, SimpMessageSendingOperations messagingTemplate) {
         this.companyMessagesService = companyMessagesService;
         this.messagingTemplate = messagingTemplate;
     }
 
     @MessageMapping("/send-message/{receiverType}/{receiverId}")
     @SendTo("/msg/receive-message/{receiverType}/{receiverId}")
-    public List<String> sendMessage(
+    public List<?> sendMessage(
             @Payload ChatMessage message,
             @Headers Map<String, Object> messageHeaders,
             @DestinationVariable Long receiverId,
