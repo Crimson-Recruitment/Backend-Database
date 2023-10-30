@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class Notifications {
     private String title;
-    private String message;
+    private Object message;
 }

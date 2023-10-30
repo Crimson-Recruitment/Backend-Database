@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class NotificationsController {
 
-    @SendTo("/payments/{paymentId}/{id}")
+    @SendTo("notify/payments/{random}")
     public Notifications sendPaymentNotification(@DestinationVariable Long paymentId,@DestinationVariable Long id, Notifications notification) {
         return notification;
     }

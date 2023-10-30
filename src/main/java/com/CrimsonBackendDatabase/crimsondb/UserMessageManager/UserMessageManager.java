@@ -16,9 +16,8 @@ public class UserMessageManager {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private List<String> messageArray;
-    private final String receiverType;
-    private final Long receiverId;
+    private String receiverType;
+    private Long receiverId;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private final Users user;
@@ -27,15 +26,9 @@ public class UserMessageManager {
     @OneToMany(mappedBy = "userMessageManager", cascade = CascadeType.ALL)
     private Collection<UserChatMessages> userMessages;
 
-    public UserMessageManager(List<String> messageArray, String receiverType, Users user, Long receiverId) {
-        this.messageArray = messageArray;
+    public UserMessageManager(String receiverType, Users user, Long receiverId) {
         this.receiverType = receiverType;
         this.receiverId = receiverId;
         this.user = user;
     }
-
-    public void setMessageArray(List<String> messageArray) {
-        this.messageArray = messageArray;
-    }
-
 }

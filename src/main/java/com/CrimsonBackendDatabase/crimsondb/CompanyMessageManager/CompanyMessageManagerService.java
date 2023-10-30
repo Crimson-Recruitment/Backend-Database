@@ -2,7 +2,6 @@ package com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyRepository;
-import com.CrimsonBackendDatabase.crimsondb.CompanyChatMessages.CompanyChatMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyChatMessages.CompanyChatMessagesService;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
@@ -10,11 +9,11 @@ import com.CrimsonBackendDatabase.crimsondb.UserChatMessages.UserChatMessagesSer
 import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessageManager;
 import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessagesException.InvalidReceiverException;
 import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessageManagerRepository;
+import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessagesException.NoChatsException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersRepository;
 import com.CrimsonBackendDatabase.crimsondb.Utils.ChatMessage;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,23 +94,30 @@ public class CompanyMessageManagerService {
             throw new InvalidTokenException();
         }
     }
-    public HashMap<String, String> clearCompanyMessages(String accessToken, Long receiverId, String receiverType) throws InvalidReceiverException, InvalidTokenException {
+    @Transactional
+    public HashMap<String, String> clearCompanyMessages(String accessToken, Long receiverId, String receiverType) throws InvalidReceiverException, InvalidTokenException, NoChatsException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
                 Optional<CompanyMessageManager> userPrimary = companyMessageManagerRepository.findCompanyMessageManagerByCompany(companyToken.get().getCompany(), receiverId);
                 if(userPrimary.isPresent()) {
-
+                    companyChatMessagesService.deleteAllMessages(receiverId,userPrimary.get());
+                    HashMap<String, String> data = new HashMap<String, String>();
+                    data.put("result", "success");
+                    return data;
                 } else {
                     if(Objects.equals(receiverType, "User")) {
                         Optional<Users> userReceiver = usersRepository.findById(receiverId);
                         if(userReceiver.isPresent()) {
                             Optional<UserMessageManager> userSecondary = userMessageManagerRepository.findUserMessageManagerByUser(userReceiver.get(), companyToken.get().getCompany().getId());
                             if(userSecondary.isPresent()) {
-
+                                userChatMessagesService.deleteAllMessages(companyToken.get().getCompany().getId(), userSecondary.get());
+                                HashMap<String, String> data = new HashMap<String, String>();
+                                data.put("result", "success");
+                                return data;
                             } else {
-
+                                throw new NoChatsException("No Chats Found!");
                             }
                         } else {
                             throw new InvalidReceiverException("Receiver id is invalid");
@@ -121,18 +127,20 @@ public class CompanyMessageManagerService {
                         if(companyReceiver.isPresent()) {
                             Optional<CompanyMessageManager> userSecondary = companyMessageManagerRepository.findCompanyMessageManagerByCompany(companyReceiver.get(), receiverId);
                             if(userSecondary.isPresent()) {
-
+                                companyChatMessagesService.deleteAllMessages(companyToken.get().getCompany().getId(), userSecondary.get());
+                                HashMap<String, String> data = new HashMap<String, String>();
+                                data.put("result", "success");
+                                return data;
                             } else {
-
+                                throw  new NoChatsException("No chats Found!");
                             }
                         }else {
                             throw new InvalidReceiverException("Receiver id is invalid");
                         }
+                    } else {
+                        throw new InvalidReceiverException("Receiver type is invalid");
                     }
                 }
-                HashMap<String, String> data = new HashMap<String, String>();
-                data.put("result", "success");
-                return data;
             } else {
                 throw new InvalidTokenException();
             }
@@ -141,44 +149,17 @@ public class CompanyMessageManagerService {
         }
 
     };
-    public HashMap<String, String> deleteCompanyMessage(String accessToken, Long receiverId, String receiverType) throws InvalidReceiverException, InvalidTokenException {
+
+    @Transactional
+    public HashMap<String, String> deleteCompanyMessage(String accessToken, Long messageId) throws InvalidReceiverException, InvalidTokenException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if(companyToken.isPresent()) {
             boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
             if(isValid) {
-                Optional<CompanyMessageManager> userPrimary = companyMessageManagerRepository.findCompanyMessageManagerByCompany(companyToken.get().getCompany(), receiverId);
-                if(userPrimary.isPresent()) {
-
-                } else {
-                    if(Objects.equals(receiverType, "User")) {
-                        Optional<Users> userReceiver = usersRepository.findById(receiverId);
-                        if(userReceiver.isPresent()) {
-                            Optional<UserMessageManager> userSecondary = userMessageManagerRepository.findUserMessageManagerByUser(userReceiver.get(), companyToken.get().getCompany().getId());
-                            if(userSecondary.isPresent()) {
-
-                            } else {
-
-                            }
-                        } else {
-                            throw new InvalidReceiverException("Receiver id is invalid");
-                        }
-                    } else if (Objects.equals(receiverType, "Company")) {
-                        Optional<Company> companyReceiver = companyRepository.findById(receiverId);
-                        if(companyReceiver.isPresent()) {
-                            Optional<CompanyMessageManager> userSecondary = companyMessageManagerRepository.findCompanyMessageManagerByCompany(companyReceiver.get(), receiverId);
-                            if(userSecondary.isPresent()) {
-
-                            } else {
-
-                            }
-                        }else {
-                            throw new InvalidReceiverException("Receiver id is invalid");
-                        }
-                    }
-                }
-                HashMap<String, String> data = new HashMap<String, String>();
-                data.put("result", "success");
-                return data;
+                companyChatMessagesService.deleteMessage(messageId);
+                HashMap<String, String> res = new HashMap<String, String>();
+                res.put("result", "success");
+                return res;
             } else {
                 throw new InvalidTokenException();
             }

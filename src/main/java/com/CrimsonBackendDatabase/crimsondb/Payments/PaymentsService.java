@@ -3,6 +3,7 @@ import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyRepository;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
+import com.CrimsonBackendDatabase.crimsondb.Notifcations.Notifications;
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidPaymentTypeException;
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.InvalidTierTypeException;
 import com.CrimsonBackendDatabase.crimsondb.Payments.PaymentsExceptions.PaymentNotFoundException;
@@ -21,6 +22,7 @@ import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import com.flutterwave.rave.java.payload.*;
 import com.flutterwave.rave.java.entry.*;
@@ -42,14 +44,16 @@ public class PaymentsService {
     private final UsersRepository usersRepository;
     private final CompanyRepository companyRepository;
     private final UsersService usersService;
+    private final SimpMessageSendingOperations messagingTemplate;
 
-    public PaymentsService(UserTokenService userTokenService, CompanyTokenService companyTokenService, PaymentsRepository paymentsRepository, UsersRepository usersRepository, CompanyRepository companyRepository, UsersService userService){
+    public PaymentsService(UserTokenService userTokenService, CompanyTokenService companyTokenService, PaymentsRepository paymentsRepository, UsersRepository usersRepository, CompanyRepository companyRepository, UsersService userService, SimpMessageSendingOperations messagingTemplate){
         this.companyTokenService =  companyTokenService;
         this.userTokenService = userTokenService;
         this.usersService = userService;
         this.paymentsRepository = paymentsRepository;
         this.usersRepository = usersRepository;
         this.companyRepository = companyRepository;
+        this.messagingTemplate = messagingTemplate;
     }
     @Transactional
     public HashMap<String, Object> userSubscribe(String accessToken, PaymentDetails paymentDetails) throws InvalidTokenException, UnknownHostException, InvalidPaymentTypeException, InvalidTierTypeException {
@@ -259,10 +263,21 @@ public class PaymentsService {
                 if(user.isPresent()) {
                     Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(user.get().getId(), "User",user.get().getPaymentRandom());
                     if (payment.isPresent()){
-                        payment.get().setStatus(data.get("status").toString());
-                        String random = RandomStringUtils.randomAlphanumeric(8);
-                        usersRepository.setUserInfoById(random, user.get().getId());
-                        return data;
+                        if(Objects.equals(data.get("status").toString(), "success")) {
+                            payment.get().setStatus(data.get("status").toString());
+                            String random = RandomStringUtils.randomAlphanumeric(12);
+                            usersRepository.setUserInfoById(random, user.get().getId());
+                            Notifications notification = new Notifications("Payment",data);
+                            messagingTemplate.convertAndSend("notify/payments/"+user.get().getPaymentRandom(), notification);
+                            return data;
+                        } else {
+                            payment.get().setStatus("failed");
+                            String random = RandomStringUtils.randomAlphanumeric(12);
+                            usersRepository.setUserInfoById(random, user.get().getId());
+                            Notifications notification = new Notifications("Payment",data);
+                            messagingTemplate.convertAndSend("notify/payments/"+user.get().getPaymentRandom(), notification);
+                            return data;
+                        }
                     } else {
                         throw new PaymentNotFoundException("This payment doesn't exist!");
                     }
@@ -283,16 +298,27 @@ public class PaymentsService {
             if(company.isPresent()) {
                 Optional<Payments> payment = paymentsRepository.findPaymentsByPayerIdPayerTypeAndRandom(company.get().getId(), "Company",company.get().getPaymentRandom());
                 if (payment.isPresent()){
-                    payment.get().setStatus(data.get("status").toString());
-                    String random = RandomStringUtils.randomAlphanumeric(8);
-                    companyRepository.setCompanyInfoById(random, company.get().getId());
+                    if(Objects.equals(data.get("status").toString(), "success")) {
+                        payment.get().setStatus(data.get("status").toString());
+                        String random = RandomStringUtils.randomAlphanumeric(12);
+                        companyRepository.setCompanyInfoById(random, company.get().getId());
+                        Notifications notification = new Notifications("Payment",data);
+                        messagingTemplate.convertAndSend("notify/payments/"+company.get().getPaymentRandom(), notification);
+                        return data;
+                    } else {
+                        payment.get().setStatus("failed");
+                        String random = RandomStringUtils.randomAlphanumeric(12);
+                        companyRepository.setCompanyInfoById(random,company.get().getId());
+                        Notifications notification = new Notifications("Payment",data);
+                        messagingTemplate.convertAndSend("notify/payments/"+company.get().getPaymentRandom(), notification);
+                        return data;
+                    }
                 } else {
                     throw new PaymentNotFoundException("This payment doesn't exist!");
                 }
             } else {
                 throw new InvalidUserException();
             }
-            return data;
         } else {
             return data;
         }

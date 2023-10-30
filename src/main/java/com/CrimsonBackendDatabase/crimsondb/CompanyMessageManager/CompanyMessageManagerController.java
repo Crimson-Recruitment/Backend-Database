@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager;
 
 import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessagesException.InvalidReceiverException;
+import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessagesException.NoChatsException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.ChatMessage;
 import org.apache.http.HttpHeaders;
@@ -26,8 +27,8 @@ public class CompanyMessageManagerController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/send-message/{receiverType}/{receiverId}")
-    @SendTo("/msg/receive-message/{receiverType}/{receiverId}")
+    @MessageMapping("/send-company/{receiverType}/{receiverId}")
+    @SendTo("/msg/receive-company/{receiverType}/{receiverId}")
     public List<?> sendMessage(
             @Payload ChatMessage message,
             @Headers Map<String, Object> messageHeaders,
@@ -44,6 +45,41 @@ public class CompanyMessageManagerController {
             throw new RuntimeException(e);
         }
     }
+
+    @MessageMapping("/delete-company/{messageId}")
+    @SendTo("/msg/del/{receiverType}/{receiverId}")
+    public HashMap<String, String> deleteMessage(
+            @Headers Map<String, Object> messageHeaders,
+            @DestinationVariable Long messageId
+            ) {
+        Map<String, List<String>> headers = (Map<String, List<String>>) messageHeaders.get("nativeHeaders");
+        String accessToken = headers.get(HttpHeaders.AUTHORIZATION).get(0);
+
+        try {
+            return companyMessagesService.deleteCompanyMessage(accessToken, messageId);
+        } catch (InvalidReceiverException | InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @MessageMapping("/clear-company/{receiverType}/{receiverId}")
+    @SendTo("/msg/clr/{receiverType}/{receiverId}")
+    public HashMap<String, String> clearAllMessages(
+            @Headers Map<String, Object> messageHeaders,
+            @DestinationVariable Long receiverId,
+            @DestinationVariable String receiverType
+    ) {
+        Map<String, List<String>> headers = (Map<String, List<String>>) messageHeaders.get("nativeHeaders");
+        String accessToken = headers.get(HttpHeaders.AUTHORIZATION).get(0);
+        try {
+            return companyMessagesService.clearCompanyMessages(accessToken,receiverId,receiverType );
+        } catch (InvalidReceiverException | InvalidTokenException | NoChatsException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 
     @SendTo("/msg/comp/err/{messageToken}")
     public HashMap<String,String> sendError(HashMap<String, String> err){
