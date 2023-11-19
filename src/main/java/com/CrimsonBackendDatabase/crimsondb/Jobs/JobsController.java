@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/jobs")
+@RequestMapping("/api/v1/jobs")
 @CrossOrigin(origins = "*")
 public class JobsController {
     private final JobsService jobsService;

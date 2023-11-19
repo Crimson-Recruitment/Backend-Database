@@ -28,7 +28,7 @@ public class UsersService {
         this.usersRepository = usersRepository;
     }
 
-    public HashMap<String, String> userRegister(Users user) throws EmailAlreadyExistsException {
+    public HashMap<String, Object> userRegister(Users user) throws EmailAlreadyExistsException {
         Optional<Users> checkUser = usersRepository.findUsersByEmail(user.getEmail());
         if(checkUser.isPresent()) {
             throw new EmailAlreadyExistsException();
@@ -37,22 +37,24 @@ public class UsersService {
             user.setTier("Free");
             usersRepository.save(user);
             String accessToken = userTokenService.generateToken(user);
-            HashMap<String, String> result = new HashMap<String, String>();
+            HashMap<String, Object> result = new HashMap<String, Object>();
             result.put("result", "success");
             result.put("accessToken", accessToken);
+            result.put("user", user);
             return result;
         }
     };
 
-    public HashMap<String, String> userLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException, InvalidTokenException {
+    public HashMap<String, Object> userLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException, InvalidTokenException {
         Optional<Users> user = usersRepository.findUsersByEmail(email);
         if (user.isPresent()) {
             boolean val =  encoder.matches(password,user.get().getPassword());
             if(val){
                 String accessToken = userTokenService.regenerateToken(user.get());
-                HashMap<String, String> result = new HashMap<String, String>();
+                HashMap<String, Object> result = new HashMap<String, Object>();
                 result.put("result","success");
                 result.put("accessToken", accessToken);
+                result.put("user", user.get());
                 return result;
             } else {
                 throw new AuthenticationException();

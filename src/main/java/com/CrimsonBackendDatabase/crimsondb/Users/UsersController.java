@@ -30,7 +30,7 @@ public class UsersController {
     }
 
     @PostMapping("/register")
-    public HashMap<String, String> userRegister(@RequestBody Users user) {
+    public HashMap<String, Object> userRegister(@RequestBody Users user) {
         try {
             return userService.userRegister(user);
         } catch (EmailAlreadyExistsException e) {
@@ -39,7 +39,7 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public  HashMap<String,String> userLogin(@RequestBody LoginDetails loginDetails) {
+    public  HashMap<String,Object> userLogin(@RequestBody LoginDetails loginDetails) {
         try {
             return userService.userLogin(loginDetails.getEmail(),loginDetails.getPassword());
         } catch (InvalidTokenException | AuthenticationException |

@@ -31,7 +31,7 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
 
-    public HashMap<String, String> companyRegister(Company company) throws EmailAlreadyExistsException {
+    public HashMap<String, Object> companyRegister(Company company) throws EmailAlreadyExistsException {
         Optional<Company> checkCompany = companyRepository.findCompanyByEmail(company.getEmail());
         if(checkCompany.isPresent()) {
             throw new EmailAlreadyExistsException();
@@ -40,22 +40,24 @@ public class CompanyService {
             company.setTier("Free");
             companyRepository.save(company);
             String accessToken = companyTokenService.generateToken(company);
-            HashMap<String, String> result = new HashMap<String, String>();
+            HashMap<String, Object> result = new HashMap<String, Object>();
             result.put("result", "success");
             result.put("accessToken",accessToken);
+            result.put("company", company);
             return result;
         }
     };
 
-    public HashMap<String, String> companyLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException {
+    public HashMap<String, Object> companyLogin(String email, String password) throws com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException, AuthenticationException {
         Optional<Company> user = companyRepository.findCompanyByEmail(email);
         if (user.isPresent()) {
             boolean val =  encoder.matches(password,user.get().getPassword());
             if(val){
                 String accessToken = companyTokenService.regenerateToken(user.get());
-                HashMap<String, String> result = new HashMap<String, String>();
+                HashMap<String, Object> result = new HashMap<String, Object>();
                 result.put("result","success");
                 result.put("accessToken",accessToken);
+                result.put("company", user.get());
                 return result;
             } else {
                 throw new AuthenticationException();

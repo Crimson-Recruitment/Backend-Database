@@ -105,7 +105,6 @@ public class JobsService {
                         job.map(target -> {
                             target.setJobTitle(newJob.getJobTitle());
                             target.setJobType(newJob.getJobType());
-                            target.setVolunteering(newJob.isVolunteering());
                             target.setLocationType(newJob.getLocationType());
                             target.setField(newJob.getField());
                             target.setJobDescription(newJob.getJobDescription());

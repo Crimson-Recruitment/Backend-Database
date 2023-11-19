@@ -23,7 +23,7 @@ public class CompanyController {
         this.companyService = companyService;
     }
     @PostMapping("/register")
-    public HashMap<String, String> companyRegister(@RequestBody Company company) {
+    public HashMap<String, Object> companyRegister(@RequestBody Company company) {
         try {
             return companyService.companyRegister(company);
         } catch (EmailAlreadyExistsException e) {
@@ -31,7 +31,7 @@ public class CompanyController {
         }
     }
     @PostMapping("/login")
-    public HashMap<String, String> companyLogin(@RequestBody LoginDetails loginDetails) {
+    public HashMap<String, Object> companyLogin(@RequestBody LoginDetails loginDetails) {
         try {
             return companyService.companyLogin(loginDetails.getEmail(),loginDetails.getPassword());
         } catch (InvalidTokenException | AuthenticationException e) {
