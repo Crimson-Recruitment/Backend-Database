@@ -33,6 +33,7 @@ public class Users {
     private String cv;
     private String password;
     private String jobTitle;
+    @Column(length = 2048)
     private String bio;
     private List<String> skills;
     private String tier;

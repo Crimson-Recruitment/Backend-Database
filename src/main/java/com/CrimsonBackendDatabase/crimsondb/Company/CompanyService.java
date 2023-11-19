@@ -37,6 +37,7 @@ public class CompanyService {
             throw new EmailAlreadyExistsException();
         } else {
             company.setPassword(encoder.encode(company.getPassword()));
+            company.setTier("Free");
             companyRepository.save(company);
             String accessToken = companyTokenService.generateToken(company);
             HashMap<String, String> result = new HashMap<String, String>();

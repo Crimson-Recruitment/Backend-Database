@@ -6,7 +6,7 @@ import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 
 import java.util.Collection;
@@ -14,6 +14,9 @@ import java.util.List;
 
 @Getter
 @Entity
+@Builder
+@Data
+@AllArgsConstructor
 @Table
 public class Company{
     @Id
@@ -28,7 +31,9 @@ public class Company{
     private boolean phoneNumberValid;
     private String secondaryPhoneNumber;
     private String category;
+    private String location;
     private String tier;
+    @Column(length = 2048)
     private String overview;
     private String password;
     @Column(length = 2048)

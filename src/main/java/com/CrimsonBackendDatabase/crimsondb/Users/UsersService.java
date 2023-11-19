@@ -34,6 +34,7 @@ public class UsersService {
             throw new EmailAlreadyExistsException();
         } else {
             user.setPassword(encoder.encode(user.getPassword()));
+            user.setTier("Free");
             usersRepository.save(user);
             String accessToken = userTokenService.generateToken(user);
             HashMap<String, String> result = new HashMap<String, String>();
