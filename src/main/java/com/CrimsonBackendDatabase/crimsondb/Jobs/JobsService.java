@@ -84,13 +84,7 @@ public class JobsService {
 
     @Transactional
     public List<Jobs> getAllJobs(String accessToken) throws InvalidTokenException {
-        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
-        Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
-        if(userToken.isPresent() || companyToken.isPresent()) {
-            return jobsRepository.findAll();
-        } else {
-            throw new  InvalidTokenException();
-        }
+        return jobsRepository.findAll();
     }
 
     @Transactional
