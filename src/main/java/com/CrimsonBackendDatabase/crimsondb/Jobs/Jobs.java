@@ -42,6 +42,7 @@ public class Jobs implements Cloneable {
     private boolean hideSalary;
     private List<String> benefits;
     private boolean requestCoverLetter;
+    @Column(length = 2048)
     private String otherDetails;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date timestamp;
