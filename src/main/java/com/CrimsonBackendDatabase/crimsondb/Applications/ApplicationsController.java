@@ -2,9 +2,9 @@ package com.CrimsonBackendDatabase.crimsondb.Applications;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.ApplicationsException.CreateApplicationsException;
 import com.CrimsonBackendDatabase.crimsondb.Applications.ApplicationsException.InvalidApplicationException;
+import com.CrimsonBackendDatabase.crimsondb.Applications.Models.ApplicationModel;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.AccessDeniedException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
-import com.CrimsonBackendDatabase.crimsondb.Utils.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +22,9 @@ public class ApplicationsController {
     }
 
     @PostMapping("/create-application/{jobId}")
-    public HashMap<String, String> createApplication(@RequestHeader("Authorization") String accessToken, @PathVariable("jobId") Long jobId) {
+    public HashMap<String, String> createApplication(@RequestBody ApplicationModel model, @RequestHeader("Authorization") String accessToken, @PathVariable("jobId") Long jobId) {
         try {
-            return  applicationsService.createApplication(accessToken,jobId);
+            return  applicationsService.createApplication(accessToken,model,jobId);
         } catch (InvalidTokenException | CreateApplicationsException e) {
             throw new RuntimeException(e);
         }
@@ -39,9 +39,9 @@ public class ApplicationsController {
     }
 
     @PostMapping("/update-application/{id}")
-    public HashMap<String, String> updateApplicationStatus(@PathVariable("id") Long id, @RequestBody Status status, @RequestHeader("Authorization") String accessToken) {
+    public HashMap<String, String> updateApplicationStatus(@PathVariable("id") Long id, @RequestBody ApplicationModel model, @RequestHeader("Authorization") String accessToken) {
         try {
-            return applicationsService.updateApplicationStatus(id, status.getStatus(),accessToken);
+            return applicationsService.updateApplicationStatus(id, model.getStatus(),accessToken);
         } catch (InvalidTokenException | InvalidApplicationException | AccessDeniedException e) {
             throw new RuntimeException(e);
         }

@@ -5,19 +5,23 @@ import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.Collection;
 
-@Getter
+@Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table
 public class Applications {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String status;
-
+    @Column(length = 2048)
+    private String coverLetter;
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
     @JoinColumn(name = "job_id", referencedColumnName = "id")
@@ -31,25 +35,5 @@ public class Applications {
     @OneToOne(mappedBy = "application", cascade = CascadeType.ALL)
     private Meetings meetings;
 
-    public Applications(String status, Jobs job, Users user) {
-        this.status = status;
-        this.job = job;
-        this.user = user;
-    }
-
-    public Applications() {
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setJob(Jobs job) {
-        this.job = job;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
-    }
 
 }

@@ -2,6 +2,7 @@ package com.CrimsonBackendDatabase.crimsondb.Applications;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.ApplicationsException.CreateApplicationsException;
 import com.CrimsonBackendDatabase.crimsondb.Applications.ApplicationsException.InvalidApplicationException;
+import com.CrimsonBackendDatabase.crimsondb.Applications.Models.ApplicationModel;
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
@@ -32,7 +33,7 @@ public class ApplicationsService {
     }
     // User Functions
     @Transactional
-    public HashMap<String, String> createApplication(String accessToken, Long jobId) throws InvalidTokenException, CreateApplicationsException {
+    public HashMap<String, String> createApplication(String accessToken, ApplicationModel model, Long jobId) throws InvalidTokenException, CreateApplicationsException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
@@ -43,7 +44,7 @@ public class ApplicationsService {
                     if(findApplication.isPresent()) {
                         throw new CreateApplicationsException("You have already applied to this job!");
                     } else {
-                        Applications application = new Applications("Submitted",job.get(),userToken.get().getUsers());
+                        Applications application = Applications.builder().status("Submitted").coverLetter(model.getCoverLetter()).user(userToken.get().getUsers()).job(job.get()).build();
                         applicationsRepository.save(application);
                         HashMap<String, String> data = new HashMap<String, String>();
                         data.put("result", "success");
