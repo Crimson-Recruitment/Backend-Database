@@ -6,8 +6,10 @@ import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Collection;
+import java.util.Date;
 
 @Data
 @Entity
@@ -22,13 +24,13 @@ public class Applications {
     private String status;
     @Column(length = 2048)
     private String coverLetter;
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date timeStamp;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "job_id", referencedColumnName = "id")
     private Jobs job;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private Users user;
 

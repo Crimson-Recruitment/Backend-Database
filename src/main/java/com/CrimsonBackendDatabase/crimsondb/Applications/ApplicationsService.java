@@ -44,7 +44,7 @@ public class ApplicationsService {
                     if(findApplication.isPresent()) {
                         throw new CreateApplicationsException("You have already applied to this job!");
                     } else {
-                        Applications application = Applications.builder().status("Submitted").coverLetter(model.getCoverLetter()).user(userToken.get().getUsers()).job(job.get()).build();
+                        Applications application = Applications.builder().timeStamp(model.getTimeStamp()).status("Submitted").coverLetter(model.getCoverLetter()).user(userToken.get().getUsers()).job(job.get()).build();
                         applicationsRepository.save(application);
                         HashMap<String, String> data = new HashMap<String, String>();
                         data.put("result", "success");

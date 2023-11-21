@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("/applications")
+@RequestMapping("/api/v1/applications")
 @CrossOrigin(origins = "*")
 public class ApplicationsController {
     private ApplicationsService applicationsService;
