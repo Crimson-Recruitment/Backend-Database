@@ -68,6 +68,8 @@ public class CompanyService {
 
     };
 
+
+
     public CompanyDetails getCompanyInfo(Long id) throws InvalidCompanyException {
         Optional<Company> company = companyRepository.findById(id);
         if(company.isPresent()){

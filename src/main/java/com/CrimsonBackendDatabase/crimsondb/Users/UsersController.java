@@ -6,6 +6,7 @@ import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsExcepti
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
 import com.CrimsonBackendDatabase.crimsondb.Utils.LoginDetails;
+import com.CrimsonBackendDatabase.crimsondb.Utils.Nofications;
 import com.CrimsonBackendDatabase.crimsondb.Utils.PasswordChange;
 import com.CrimsonBackendDatabase.crimsondb.Utils.UserDetails;
 import org.json.JSONException;
@@ -68,7 +69,7 @@ public class UsersController {
     }
 
     @PostMapping("/update")
-    public HashMap<String, String> updateUserDetails(@RequestHeader("Authorization") String accessToken,@RequestBody Users user) {
+    public HashMap<String, Object> updateUserDetails(@RequestHeader("Authorization") String accessToken,@RequestBody Users user) {
         try {
             return userService.updateUserDetails(accessToken,user);
         } catch (com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
@@ -79,8 +80,16 @@ public class UsersController {
     public HashMap<String, String> changePassword(@RequestHeader("Authorization") String accessToken, @RequestBody PasswordChange passwordChange) {
         try {
             return  userService.changePassword(accessToken,passwordChange);
-        } catch (AuthenticationException |
-                 com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PostMapping("/set-notifications")
+    public  HashMap<String, String> handleNotifcations(@RequestBody Nofications nofications, @RequestHeader("Authorization") String token) {
+        try {
+            return userService.handleNotifications(token,nofications.isNotifications());
+        } catch (com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException e) {
             throw new RuntimeException(e);
         }
     }

@@ -5,7 +5,7 @@ import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessageManage
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 import org.apache.maven.surefire.shared.lang3.RandomStringUtils;
 
 import java.util.Collection;
@@ -13,7 +13,9 @@ import java.util.List;
 
 @Entity
 @Table
-@Getter
+@Data
+@Builder
+@AllArgsConstructor
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,8 @@ public class Users {
     private String email;
     private String location;
     private boolean emailValid;
+    private boolean enableNotifications;
+    private String hash;
 
     @Column(length = 2048)
     private String profileImage;

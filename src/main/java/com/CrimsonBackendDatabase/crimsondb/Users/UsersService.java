@@ -89,12 +89,11 @@ public class UsersService {
     }
 
     @Transactional
-    public HashMap<String, String> updateUserDetails(String accessToken, Users user) throws InvalidTokenException {
+    public HashMap<String, Object> updateUserDetails(String accessToken, Users user) throws InvalidTokenException {
         Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
         if(userToken.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(userToken.get().getUsers().getId()));
             if(isValid) {
-                System.out.println(user.toString());
                 usersRepository.findById(userToken.get().getUsers().getId()).map(target -> {
                     target.setFirstName(user.getFirstName());
                     target.setLastName(user.getLastName());
@@ -108,15 +107,13 @@ public class UsersService {
                         target.setPhoneNumber(user.getPhoneNumber());
                         target.setPhoneNumberValid(false);
                     }
-                    target.setEmail(user.getEmail());
                     target.setProfileImage(user.getProfileImage());
-                    target.setCv(user.getCv());
                     target.setSkills(user.getSkills());
-                    target.setPassword(encoder.encode(user.getPassword()));
                     return target;
                 });
-                HashMap<String, String> data = new HashMap<String, String>();
+                HashMap<String, Object> data = new HashMap<String, Object>();
                 data.put("result", "success");
+                data.put("user",user);
                 return data;
             } else {
                 throw new InvalidTokenException();
@@ -148,13 +145,37 @@ public class UsersService {
     }
 
     @Transactional
-    public HashMap<String, String> changePassword(String accessToken, PasswordChange passwordChange) throws AuthenticationException, InvalidTokenException {
+    public HashMap<String, String> changePassword(String accessToken, PasswordChange passwordChange) throws Exception {
         Optional<UserToken> session = userTokenService.findUserToken(accessToken);
         if(session.isPresent()) {
             boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(session.get().getUsers().getId()));
             if(isValid) {
                 Users users = session.get().getUsers();
-                users.setPassword(encoder.encode(passwordChange.getNewPassword()));
+                if(encoder.matches(passwordChange.getOldPassword(), users.getPassword())) {
+                    users.setPassword(encoder.encode(passwordChange.getNewPassword()));
+                    HashMap<String, String> data = new HashMap<String, String>();
+                    data.put("result", "success");
+                    return data;
+                } else {
+                    throw new Exception("Old Password doesn't match current password!");
+                }
+
+            } else {
+                throw new InvalidTokenException();
+            }
+        } else {
+            throw new InvalidTokenException();
+        }
+    }
+
+    @Transactional
+    public HashMap<String, String> handleNotifications(String accessToken, boolean notifications) throws InvalidTokenException {
+        Optional<UserToken> session = userTokenService.findUserToken(accessToken);
+        if (session.isPresent()) {
+            boolean isValid = userTokenService.validateToken(accessToken, String.valueOf(session.get().getUsers().getId()));
+            if (isValid) {
+                Users users = session.get().getUsers();
+                users.setEnableNotifications(notifications);
                 HashMap<String, String> data = new HashMap<String, String>();
                 data.put("result", "success");
                 return data;
@@ -165,6 +186,7 @@ public class UsersService {
             throw new InvalidTokenException();
         }
     }
+
 
 
     public HashMap<String, String> validateEmail(String accessToken) throws InvalidTokenException {

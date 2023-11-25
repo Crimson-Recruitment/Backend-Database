@@ -40,6 +40,7 @@ public class Company{
     private String zoomAccessToken;
     @Column(length = 2048)
     private String zoomRefreshToken;
+    private String hash;
     private String paymentRandom = RandomStringUtils.randomAlphanumeric(8);
 
     private List<String> companyImages;
