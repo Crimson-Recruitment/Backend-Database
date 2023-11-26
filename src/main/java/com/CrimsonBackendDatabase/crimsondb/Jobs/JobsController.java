@@ -45,9 +45,9 @@ public class JobsController {
     }
 
     @GetMapping("/all")
-    public List<Jobs> getAllJobs(@RequestHeader("Authorization") String accessToken) {
+    public List<Jobs> getAllJobs() {
         try {
-            return jobsService.getAllJobs(accessToken);
+            return jobsService.getAllJobs();
         } catch (InvalidTokenException e) {
             throw new RuntimeException(e);
         }

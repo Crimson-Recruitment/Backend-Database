@@ -83,7 +83,7 @@ public class JobsService {
     ;
 
     @Transactional
-    public List<Jobs> getAllJobs(String accessToken) throws InvalidTokenException {
+    public List<Jobs> getAllJobs() throws InvalidTokenException {
         return jobsRepository.findAll();
     }
 
