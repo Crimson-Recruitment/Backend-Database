@@ -13,9 +13,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
 
         registry.addMapping("/api/v1/**")
-                .allowedOrigins("http://localhost:3000","https://crimsonrecruit.com")
+                .allowedOrigins("https://crimson-recruitment.web.app","http://localhost:3000","https://crimsonrecruit.com")
                 .allowedMethods("GET", "POST")
-                .allowedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Methods")
+                .allowedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Content-Type", "withCredentials")
                 .allowCredentials(true).maxAge(3600);
 
         // Add more mappings...
