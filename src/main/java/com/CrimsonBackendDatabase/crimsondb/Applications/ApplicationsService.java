@@ -89,6 +89,7 @@ public class ApplicationsService {
                     Company company = application.get().getJob().getCompany();
                     if(Objects.equals(company.getId(), companyToken.get().getCompany().getId())) {
                         application.get().setStatus(status);
+                        System.out.println("Updated status Successfully");
                         HashMap<String, String> data = new HashMap<String, String>();
                         data.put("result", "success");
                         return data;

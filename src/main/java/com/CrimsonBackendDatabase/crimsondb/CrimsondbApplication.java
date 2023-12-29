@@ -11,5 +11,4 @@ public class CrimsondbApplication {
 		SpringApplication.run(CrimsondbApplication.class, args);
 	}
 
-
 }

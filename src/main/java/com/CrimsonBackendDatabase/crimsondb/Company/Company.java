@@ -27,6 +27,7 @@ public class Company{
     private boolean emailValid;
     @Column(length = 2048)
     private String profileImage;
+    private String website;
     private String primaryPhoneNumber;
     private boolean phoneNumberValid;
     private String secondaryPhoneNumber;

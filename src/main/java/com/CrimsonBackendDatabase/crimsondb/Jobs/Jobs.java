@@ -6,10 +6,7 @@ import com.CrimsonBackendDatabase.crimsondb.Meetings.Meetings;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Collection;
@@ -21,7 +18,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 public class Jobs implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +26,7 @@ public class Jobs implements Cloneable {
     private String jobType;
     private String locationType;
     private String field;
+    private String otherSite;
     @Column(length = 2048)
     private String jobDescription;
     private String location;
@@ -47,9 +44,7 @@ public class Jobs implements Cloneable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date timestamp;
 
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.DETACH)
+    @ManyToOne( cascade = CascadeType.DETACH)
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
