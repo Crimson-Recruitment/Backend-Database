@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @RestController
-@RequestMapping("/meeting")
+@RequestMapping("/api/v1/meeting")
 public class MeetingsController {
     private final MeetingsService meetingsService;
     @Autowired

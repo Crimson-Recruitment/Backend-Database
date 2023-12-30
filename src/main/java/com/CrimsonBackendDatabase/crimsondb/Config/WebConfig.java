@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/v1/**")
                 .allowedOrigins("https://crimson-recruitment.web.app","http://localhost:3000","https://crimsonrecruit.com")
                 .allowedMethods("GET", "POST")
-                .allowedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Content-Type", "withCredentials")
+                .allowedHeaders("Authorization","Access-Control-Allow-Origin", "Access-Control-Allow-Methods", "Content-Type", "withCredentials")
                 .allowCredentials(true).maxAge(3600);
 
         // Add more mappings...

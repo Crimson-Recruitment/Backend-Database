@@ -32,10 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -70,32 +67,87 @@ public class MeetingsService {
         if (companyToken.isPresent()) {
             Optional<Applications> applications = applicationsRepository.findById(applicationId);
             if(applications.isPresent()) {
-                Company company = companyToken.get().getCompany();
-                HttpRequest request = HttpRequest
-                        .newBuilder(URI.create("https://api.zoom.us/v2/users/me/meetings"))
-                        .header("Content-Type", "application/json")
-                        .header("Authorization","Bearer "+company.getZoomAccessToken())
-                        .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(meetingInfo)))
-                        .build();
-                HttpResponse<String> response = null;
-                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-                HashMap<String, Object> body = null;
-                String DEFAULT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
-                int statusCode = 0;
-                DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
-                body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
-                Meetings meeting = new Meetings(
-                        body.get("join_url").toString(),
-                        body.get("agenda").toString(),
-                        Date.from(Instant.parse(body.get("start_time").toString())),
-                                body.get("h323_password").toString(),
-                                body.get("timezone").toString(),
-                                applications.get()
-                        );
-                meetingsRepository.save(meeting);
-                HashMap<String,Object> result = new HashMap<>();
-                result.put("result","success");
-                return result;
+                if(applications.get().getMeetings() == null) {
+                    Company company = companyToken.get().getCompany();
+                    HttpRequest request = HttpRequest
+                            .newBuilder(URI.create("https://api.zoom.us/v2/users/me/meetings"))
+                            .header("Content-Type", "application/json")
+                            .header("Authorization","Bearer "+company.getZoomAccessToken())
+                            .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(meetingInfo)))
+                            .build();
+                    HttpResponse<String> response = null;
+                    response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    HashMap<String, Object> body = null;
+                    String DEFAULT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
+                    int statusCode = 0;
+                    DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
+                    body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
+                    Meetings meeting;
+                    if(Objects.equals(meetingInfo.getMeetingType(),"online")) {
+                        meeting = Meetings.builder().joinUrl(
+                                body.get("join_url").toString()).agenda(
+                                body.get("agenda").toString()).startTime(
+                                Date.from(Instant.parse(body.get("start_time").toString()))).password(
+                                body.get("h323_password").toString()).timeZone(
+                                body.get("timezone").toString()).application(
+                                applications.get()).meetingType(meetingInfo.getMeetingType()).build();
+                    } else if (Objects.equals(meetingInfo.getMeetingType(),"physical")) {
+                        meeting = Meetings.builder()
+                                .location(meetingInfo.getLocation())
+                                .contactEmail(meetingInfo.getContactEmail())
+                                .contactPhoneNumber(meetingInfo.getContactPhoneNumber())
+                                .streetName(meetingInfo.getStreetName())
+                                .otherDetails(meetingInfo.getOtherDetails())
+                                .meetingType(meetingInfo.getMeetingType())
+                                .build();
+                    } else {
+                        throw new InvalidApplicationException("Invalid meeting type!");
+                    }
+
+                    meetingsRepository.save(meeting);
+                    HashMap<String,Object> result = new HashMap<>();
+                    result.put("result","success");
+                    return result;
+                } else {
+                    Meetings meeting = applications.get().getMeetings();
+                    Company company = companyToken.get().getCompany();
+                    HttpRequest request = HttpRequest
+                            .newBuilder(URI.create("https://api.zoom.us/v2/users/me/meetings"))
+                            .header("Content-Type", "application/json")
+                            .header("Authorization","Bearer "+company.getZoomAccessToken())
+                            .POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(meetingInfo)))
+                            .build();
+                    HttpResponse<String> response = null;
+                    response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    HashMap<String, Object> body = null;
+                    String DEFAULT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssZ";
+                    int statusCode = 0;
+                    DateFormat formatter = new SimpleDateFormat(DEFAULT_PATTERN);
+                    body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
+                    if(Objects.equals(meetingInfo.getMeetingType(),"online")) {
+                        meeting.setJoinUrl(body.get("join_url").toString());
+                        meeting.setAgenda(body.get("agenda").toString());
+                        meeting.setStartTime(Date.from(Instant.parse(body.get("start_time").toString())));
+                        meeting.setPassword(body.get("h323_password").toString());
+                        meeting.setTimeZone( body.get("timezone").toString());
+                        meeting.setMeetingType(meetingInfo.getMeetingType());
+                    } else if (Objects.equals(meetingInfo.getMeetingType(),"physical")) {
+                        meeting.setLocation(meetingInfo.getLocation());
+                        meeting.setContactEmail(meetingInfo.getContactEmail());
+                        meeting.setContactPhoneNumber(meetingInfo.getContactPhoneNumber());
+                        meeting.setStreetName(meetingInfo.getStreetName());
+                        meeting.setOtherDetails(meetingInfo.getOtherDetails());
+                        meeting.setMeetingType(meeting.getMeetingType());
+                    } else {
+                        throw new InvalidApplicationException("Invalid meeting type!");
+                    }
+
+                    meetingsRepository.save(meeting);
+                    HashMap<String,Object> result = new HashMap<>();
+                    result.put("result","success");
+                    return result;
+                }
+
             } else {
                 throw new InvalidApplicationException();
             }
