@@ -205,11 +205,11 @@ public class MeetingsService {
     }
 
     @Transactional
-    public HashMap<String,String> getCode(String accessToken, String code) throws InvalidTokenException, ExecutionException, InterruptedException, IOException, ZoomAuthorizationException {
+    public HashMap<String, Object> getCode(String accessToken, String code) throws InvalidTokenException, ExecutionException, InterruptedException, IOException, ZoomAuthorizationException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
         if (companyToken.isPresent()) {
             Company company = companyToken.get().getCompany();
-            String urlParameters = "code="+code+"&grant_type=authorization_code&redirect_uri=http://127.0.0.1:8081/meeting/get-code";
+            String urlParameters = "code="+code+"&grant_type=authorization_code&redirect_uri=http://localhost:3000/zoom-success";
             HttpRequest zoomAuth = HttpRequest
                     .newBuilder(URI.create("https://zoom.us/oauth/token"))
                     .header("Content-Type", "application/x-www-form-urlencoded")
@@ -224,8 +224,9 @@ public class MeetingsService {
             if(body.get("error") == null) {
                 company.setZoomAccessToken(body.get("access_token"));
                 company.setZoomRefreshToken(body.get("refresh_token"));
-                HashMap<String,String> result = new HashMap<String, String>();
+                HashMap<String,Object> result = new HashMap<String, Object>();
                 result.put("result","success");
+                result.put("company", company);
                 return result;
             } else {
                 throw new ZoomAuthorizationException("Zoom Error: "+body.get("error")+" Reason: "+body.get("reason"));

@@ -46,7 +46,7 @@ public class MeetingsController {
         }
     }
 
-    @GetMapping("/refresh_token")
+    @GetMapping("/refresh-token")
     public HashMap<String,String> refreshZoomAccessToken(@RequestHeader("Authorization") String accessToken) {
         try {
             return meetingsService.refreshAccessToken(accessToken);
@@ -56,7 +56,7 @@ public class MeetingsController {
     }
 
     @PostMapping("/get-code")
-    public HashMap<String, String> getCode(@RequestParam("accessCode") String accessToken,@RequestParam("code") String code){
+    public HashMap<String, Object> getCode(@RequestParam("accessCode") String accessToken,@RequestParam("code") String code){
 
         try {
             return meetingsService.getCode(accessToken,code);
