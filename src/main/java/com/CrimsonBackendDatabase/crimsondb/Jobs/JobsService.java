@@ -109,6 +109,8 @@ public class JobsService {
                             target.setMaxSalary(newJob.getMaxSalary());
                             target.setHideSalary(newJob.isHideSalary());
                             target.setBenefits(newJob.getBenefits());
+                            target.setCompanyName(newJob.getCompanyName());
+                            target.setCompanyOverview(newJob.getCompanyOverview());
                             target.setRequestCoverLetter(newJob.isRequestCoverLetter());
                             target.setOtherDetails(newJob.getOtherDetails());
                            return target;

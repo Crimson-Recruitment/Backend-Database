@@ -24,6 +24,8 @@ public class Jobs implements Cloneable {
     private Long id;
     private String jobTitle;
     private String jobType;
+    private String companyName;
+    private String companyOverview;
     private String locationType;
     private String field;
     private String otherSite;
