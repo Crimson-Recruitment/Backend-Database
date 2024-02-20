@@ -28,6 +28,8 @@ public class Meetings {
     private String contactPhoneNumber;
     private String contactEmail;
     private String meetingType;
+    private Long userId;
+    private Long companyId;
     private String agenda;
     private String password;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

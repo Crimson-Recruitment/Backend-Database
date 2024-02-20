@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -43,6 +44,24 @@ public class MeetingsController {
             return new ResponseEntity<Meetings>(meetingsService.getMeetingDetails(accessToken, id), HttpStatus.OK);
         } catch (InvalidMeetingException | InvalidTokenException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/user-meetings/{id}")
+    public  ResponseEntity<List<Meetings>> getUserMeetings(@PathVariable("id") Long id) {
+        try {
+           return new ResponseEntity<List<Meetings>>(meetingsService.getAllUserMeetings(id), HttpStatus.OK);
+        } catch (Exception e) {
+            throw  new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/company-meetings/{id}")
+    public  ResponseEntity<List<Meetings>> getCompanyMeetings(@PathVariable("id") Long id) {
+        try {
+            return new ResponseEntity<List<Meetings>>(meetingsService.getAllCompanyMeetings(id), HttpStatus.OK);
+        } catch (Exception e) {
+            throw  new RuntimeException(e);
         }
     }
 

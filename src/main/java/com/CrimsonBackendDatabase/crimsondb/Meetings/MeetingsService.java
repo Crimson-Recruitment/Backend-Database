@@ -61,6 +61,13 @@ public class MeetingsService {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
+    public List<Meetings> getAllUserMeetings(Long id) {
+        return meetingsRepository.findMeetingByUser(id).orElseThrow();
+    }
+
+    public List<Meetings> getAllCompanyMeetings(Long id) {
+        return meetingsRepository.findMeetingByCompany(id).orElseThrow();
+    }
     @Transactional
     public HashMap<String, Object> scheduleMeeting(String accessToken,MeetingInfo meetingInfo, Long applicationId) throws InvalidTokenException, IOException, InterruptedException, ParseException, InvalidApplicationException {
         Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
@@ -84,7 +91,7 @@ public class MeetingsService {
                     body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
                     Meetings meeting;
                     if(Objects.equals(meetingInfo.getMeetingType(),"online")) {
-                        meeting = Meetings.builder().joinUrl(
+                        meeting = Meetings.builder().companyId(company.getId()).userId(applications.get().getUser().getId()).joinUrl(
                                 body.get("join_url").toString()).agenda(
                                 body.get("agenda").toString()).startTime(
                                 Date.from(Instant.parse(body.get("start_time").toString()))).password(
