@@ -91,15 +91,23 @@ public class MeetingsService {
                     body = new Gson().fromJson(response.body(), new TypeToken<HashMap<String, Object>>(){}.getType());
                     Meetings meeting;
                     if(Objects.equals(meetingInfo.getMeetingType(),"online")) {
-                        meeting = Meetings.builder().companyId(company.getId()).userId(applications.get().getUser().getId()).joinUrl(
-                                body.get("join_url").toString()).agenda(
-                                body.get("agenda").toString()).startTime(
-                                Date.from(Instant.parse(body.get("start_time").toString()))).password(
-                                body.get("h323_password").toString()).timeZone(
-                                body.get("timezone").toString()).application(
-                                applications.get()).meetingType(meetingInfo.getMeetingType()).build();
+                        meeting = Meetings
+                                .builder()
+                                .application(applications.get())
+                                .companyId(company.getId())
+                                .userId(applications.get().getUser().getId())
+                                .joinUrl(body.get("join_url").toString())
+                                .agenda(body.get("agenda").toString())
+                                .startTime(Date.from(Instant.parse(body.get("start_time").toString())))
+                                .password(body.get("h323_password").toString())
+                                .timeZone(body.get("timezone").toString())
+                                .application(applications.get())
+                                .meetingType(meetingInfo.getMeetingType()).build();
                     } else if (Objects.equals(meetingInfo.getMeetingType(),"physical")) {
                         meeting = Meetings.builder()
+                                .application(applications.get())
+                                .companyId(company.getId())
+                                .userId(applications.get().getUser().getId())
                                 .location(meetingInfo.getLocation())
                                 .contactEmail(meetingInfo.getContactEmail())
                                 .contactPhoneNumber(meetingInfo.getContactPhoneNumber())
@@ -112,6 +120,7 @@ public class MeetingsService {
                     }
 
                     meetingsRepository.save(meeting);
+                    applications.get().setStatus("Meeting Scheduled");
                     HashMap<String,Object> result = new HashMap<>();
                     result.put("result","success");
                     return result;
