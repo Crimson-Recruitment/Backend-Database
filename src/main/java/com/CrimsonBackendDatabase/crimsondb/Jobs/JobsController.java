@@ -26,10 +26,28 @@ public class JobsController {
             throw new RuntimeException(e);
         }
     }
+
+    @PostMapping("/post-admin-job")
+    public HashMap<String, String> postAdminJob(@RequestBody Jobs job, @RequestHeader("Authorization") String accessToken) {
+        try {
+            return jobsService.postAdminJob(job, accessToken);
+        } catch (InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @GetMapping("/company-jobs/{id}")
     public List<Jobs> getAllCompanyJobs(@PathVariable("id") Long id,@RequestHeader("Authorization") String accessToken) {
         try {
             return jobsService.getAllCompanyJobs(id,accessToken);
+        } catch (InvalidTokenException | InvalidCompanyException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping("/admin-jobs/{id}")
+    public List<Jobs> getAdminJobs(@PathVariable("id") Long id,@RequestHeader("Authorization") String accessToken) {
+        try {
+            return jobsService.getAdminJobs(id,accessToken);
         } catch (InvalidTokenException | InvalidCompanyException e) {
             throw new RuntimeException(e);
         }

@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface JobsRepository extends JpaRepository<Jobs, Long> {
     @Query("SELECT s FROM Jobs s WHERE s.company = ?1")
     Optional<List<Jobs>> findJobsByCompany(Company company);
+    @Query("SELECT s FROM Jobs s WHERE s.company = null")
+    Optional<List<Jobs>> findAdminJobs();
 
     @Query("SELECT s FROM Jobs s WHERE s.field = ?1")
     Optional<List<Jobs>> findJobsByField(String field);

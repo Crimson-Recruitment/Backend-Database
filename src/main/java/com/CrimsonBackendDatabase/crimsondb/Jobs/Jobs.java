@@ -25,6 +25,7 @@ public class Jobs implements Cloneable {
     private String jobTitle;
     private String jobType;
     private String companyName;
+    @Column(length = 2048)
     private String companyOverview;
     private String locationType;
     private String field;

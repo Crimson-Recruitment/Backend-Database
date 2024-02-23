@@ -48,7 +48,23 @@ public class JobsService {
         }
     }
 
-    ;
+    @Transactional
+    public HashMap<String, String> postAdminJob(Jobs job, String accessToken) throws InvalidTokenException {
+        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
+        if (companyToken.isPresent()) {
+            boolean isValid = companyTokenService.validateToken(accessToken, String.valueOf(companyToken.get().getCompany().getId()));
+            if (isValid) {
+                jobsRepository.save(job);
+                HashMap<String, String> data = new HashMap<String, String>();
+                data.put("result", "success");
+                return data;
+            } else {
+                throw new InvalidTokenException();
+            }
+        } else {
+            throw new InvalidTokenException();
+        }
+    }
 
     @Transactional
     public List<Jobs> getAllCompanyJobs(Long id, String accessToken) throws InvalidTokenException, InvalidCompanyException {
@@ -59,6 +75,23 @@ public class JobsService {
             if (company.isPresent()) {
                 Optional<List<Jobs>> jobsByCompany = jobsRepository.findJobsByCompany(company.get());
                 return jobsByCompany.orElseGet(ArrayList::new);
+            } else {
+                throw new InvalidCompanyException();
+            }
+        } else {
+            throw new InvalidTokenException();
+        }
+    }
+
+    @Transactional
+    public List<Jobs> getAdminJobs(Long id, String accessToken) throws InvalidTokenException, InvalidCompanyException {
+        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
+        Optional<UserToken> userToken = userTokenService.findUserToken(accessToken);
+        if(userToken.isPresent()||companyToken.isPresent()) {
+            Optional<Company> company = companyRepository.findById(id);
+            if (company.isPresent()) {
+                Optional<List<Jobs>> adminJobs= jobsRepository.findAdminJobs();
+                return adminJobs.orElseGet(ArrayList::new);
             } else {
                 throw new InvalidCompanyException();
             }
