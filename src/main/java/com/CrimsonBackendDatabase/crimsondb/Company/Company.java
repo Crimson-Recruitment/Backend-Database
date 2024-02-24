@@ -3,6 +3,7 @@ package com.CrimsonBackendDatabase.crimsondb.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyChatMessages.CompanyChatMessages;
 import com.CrimsonBackendDatabase.crimsondb.CompanyMessageManager.CompanyMessageManager;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
+import com.CrimsonBackendDatabase.crimsondb.Employee.Employee;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -53,6 +54,9 @@ public class Company{
     @JsonIgnore
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     private Collection<Jobs> jobs;
+    @JsonIgnore
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private Collection<Employee> employees;
 
 
     public Company() {

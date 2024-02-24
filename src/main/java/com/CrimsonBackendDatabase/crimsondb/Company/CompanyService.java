@@ -3,6 +3,7 @@ package com.CrimsonBackendDatabase.crimsondb.Company;
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCompanyException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
+import com.CrimsonBackendDatabase.crimsondb.Employee.Employee;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
@@ -14,10 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CompanyService {
@@ -126,6 +124,14 @@ public class CompanyService {
         }
 
     };
+
+    public List<Employee> getAllCompanyEmployees(String accessToken) throws InvalidTokenException {
+        Optional<CompanyToken> companyToken = companyTokenService.findCompanyToken(accessToken);
+        if(companyToken.isPresent()) return (List<Employee>) companyToken.get().getCompany().getEmployees();
+        else {
+            throw new InvalidTokenException();
+        }
+    }
 
     public HashMap<String, String> getAccessToken(String email) throws InvalidUserException {
         Optional<Company> company = companyRepository.findCompanyByEmail(email);

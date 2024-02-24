@@ -6,12 +6,14 @@ import com.CrimsonBackendDatabase.crimsondb.Applications.Models.ApplicationModel
 import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyToken;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenService;
+import com.CrimsonBackendDatabase.crimsondb.Employee.EmployeeService;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.JobExceptions.AccessDeniedException;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.Jobs;
 import com.CrimsonBackendDatabase.crimsondb.Jobs.JobsRepository;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenExceptions.InvalidTokenException;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserTokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,18 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ApplicationsService {
     private final UserTokenService userTokenService;
     private final CompanyTokenService companyTokenService;
     private final JobsRepository jobsRepository;
     private final ApplicationsRepository applicationsRepository;
-    @Autowired
-    public ApplicationsService(UserTokenService userTokenService, JobsRepository jobsRepository, ApplicationsRepository applicationsRepository, CompanyTokenService companyTokenService) {
-        this.userTokenService = userTokenService;
-        this.jobsRepository = jobsRepository;
-        this.applicationsRepository = applicationsRepository;
-        this.companyTokenService = companyTokenService;
-    }
+    private final EmployeeService employeeService;
     // User Functions
     @Transactional
     public HashMap<String, String> createApplication(String accessToken, ApplicationModel model, Long jobId) throws InvalidTokenException, CreateApplicationsException {
@@ -88,6 +85,9 @@ public class ApplicationsService {
                 if(application.isPresent()) {
                     Company company = application.get().getJob().getCompany();
                     if(Objects.equals(company.getId(), companyToken.get().getCompany().getId())) {
+                        if (Objects.equals(status, "Approved")) {
+                            employeeService.createEmployee(application.get().getUser().getId(),accessToken);
+                        }
                         application.get().setStatus(status);
                         System.out.println("Updated status Successfully");
                         HashMap<String, String> data = new HashMap<String, String>();

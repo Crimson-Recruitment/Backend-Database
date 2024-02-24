@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Users;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
+import com.CrimsonBackendDatabase.crimsondb.Employee.Employee;
 import com.CrimsonBackendDatabase.crimsondb.UserMessageManager.UserMessageManager;
 import com.CrimsonBackendDatabase.crimsondb.UserToken.UserToken;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -52,8 +53,8 @@ public class Users {
     private Collection<Applications> applications;
     @JsonIgnore
     @OneToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name="user_id", referencedColumnName = "id")
-    private Users user;
+    @JoinColumn(name="employee_id", referencedColumnName = "id")
+    private Employee employee;
     public Users() {
         paymentRandom = RandomStringUtils.randomAlphanumeric(8);
     }

@@ -2,6 +2,7 @@ package com.CrimsonBackendDatabase.crimsondb.Company;
 
 import com.CrimsonBackendDatabase.crimsondb.Company.CompanyExceptions.InvalidCompanyException;
 import com.CrimsonBackendDatabase.crimsondb.CompanyToken.CompanyTokenExceptions.InvalidTokenException;
+import com.CrimsonBackendDatabase.crimsondb.Employee.Employee;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.AuthenticationException;
 import com.CrimsonBackendDatabase.crimsondb.Exceptions.EmailAlreadyExistsException;
 import com.CrimsonBackendDatabase.crimsondb.Users.UsersException.InvalidUserException;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/company")
@@ -56,7 +58,16 @@ public class CompanyController {
         }
     }
 
-    @GetMapping("/get-access-token")
+    @GetMapping("/employees")
+    public List<Employee> getCompanyEmployees(@RequestHeader("Authorization") String accessToken) {
+        try {
+            return companyService.getAllCompanyEmployees(accessToken);
+        } catch (InvalidTokenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+        @GetMapping("/get-access-token")
     public HashMap<String,String> getAccessToken(@RequestParam("email") String email) {
         try {
             return companyService.getAccessToken(email);

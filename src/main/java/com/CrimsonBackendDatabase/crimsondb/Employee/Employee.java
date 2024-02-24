@@ -1,6 +1,7 @@
 package com.CrimsonBackendDatabase.crimsondb.Employee;
 
 import com.CrimsonBackendDatabase.crimsondb.Applications.Applications;
+import com.CrimsonBackendDatabase.crimsondb.Company.Company;
 import com.CrimsonBackendDatabase.crimsondb.Users.Users;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,9 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Date dateOfBirth;
     private String gender;
     private String address;
@@ -35,4 +39,7 @@ public class Employee {
     @OneToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private Users user;
+    @ManyToOne( cascade = CascadeType.DETACH)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
 }
