@@ -16,6 +16,8 @@ C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendData
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Payments\Payments.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Users\UsersRepository.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Utils\Nofications.java
+C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Employee\EmployeeController.java
+C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Employee\EmployeeRepository.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\CompanyChatMessages\CompanyChatMessages.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\CompanyChatMessages\CompanyChatMessagesService.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\CompanyMessageManager\CompanyMessageManagerService.java
@@ -64,10 +66,12 @@ C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendData
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\UserChatMessages\UserChatMessagesRepository.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Applications\ApplicationsController.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Config\WebSocketConfiguration.java
+C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Employee\EmployeeService.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\UserToken\UserTokenRepository.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Company\Company.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\CompanyMessageManager\CompanyMessageManager.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\UserMessageManager\UserMessageManagerService.java
+C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Employee\Employee.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\CompanyMessageManager\CompanyMessageManagerController.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\Utils\UserDetails.java
 C:\Users\DELL\Desktop\Work\Backend-Database\src\main\java\com\CrimsonBackendDatabase\crimsondb\UserToken\UserTokenService.java

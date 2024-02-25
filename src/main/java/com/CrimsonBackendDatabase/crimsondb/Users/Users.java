@@ -52,9 +52,8 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<Applications> applications;
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.DETACH)
-    @JoinColumn(name="employee_id", referencedColumnName = "id")
-    private Employee employee;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<Employee> employees;
     public Users() {
         paymentRandom = RandomStringUtils.randomAlphanumeric(8);
     }

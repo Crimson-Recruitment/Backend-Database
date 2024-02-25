@@ -86,7 +86,7 @@ public class ApplicationsService {
                     Company company = application.get().getJob().getCompany();
                     if(Objects.equals(company.getId(), companyToken.get().getCompany().getId())) {
                         if (Objects.equals(status, "Approved")) {
-                            employeeService.createEmployee(application.get().getUser().getId(),accessToken);
+                            employeeService.createEmployee(application.get().getUser().getId(),accessToken, application.get().getJob().getJobTitle());
                         }
                         application.get().setStatus(status);
                         System.out.println("Updated status Successfully");

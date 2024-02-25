@@ -36,7 +36,7 @@ public class Employee {
     private String nextOfKinRelationship;
     private String nextOfKinPhone;
     private String nextOfKinAddress;
-    @OneToOne(cascade = CascadeType.DETACH)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name="user_id", referencedColumnName = "id")
     private Users user;
     @ManyToOne( cascade = CascadeType.DETACH)
